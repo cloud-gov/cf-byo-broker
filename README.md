@@ -1,7 +1,19 @@
 # cg-customer-broker
+
 Delivery of https://github.com/18F/cg-product/blob/master/helpwanted/CustomBrokerDemo.md#user-stories
 
-The goal of this effort is to delivery documentation and training which will show a cloud.gov user how to add a space scoped broker so it shows up in their marketplace.
+The goal of this effort is to deliver documentation and training which will show a cloud.gov user how to add a space scoped broker so it shows up in their marketplace.
+
+## Project Resources
+
+**Concourse CI**: 18f team on https://ci.aws.rscale.io
+
+**Pivotal Tracker**: https://www.pivotaltracker.com/projects/2233580
+
+**Development Environment**: 18f (org) / development (space) on PWS *(not public)*
+
+**Integration Test Environment**: 18f (org) / integration (space) on PWS *(not public)*
+
 
 ## Persona Characteristics
 
@@ -50,4 +62,3 @@ Maybe:
 * app sec groups
 * writing your own broker (beyond)
 * best practices on space management for brokers/apps
-
