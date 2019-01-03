@@ -1,0 +1,20 @@
+---
+
+resources:
+
+- name: cg-customer-broker
+  type: git
+  source:
+    uri: git@github.com:resilientscale/cg-customer-broker.git
+    branch: master
+    depth: 1
+
+jobs:
+
+# REMOVE WHEN THE REAL WORK STARTS!
+- name: lazy
+  plan:
+  - get: cg-customer-broker
+    trigger: true
+  - task: tell-it-like-it-is
+    file: cg-customer-broker/ci/tasks/lazy.yml
