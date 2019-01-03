@@ -4,3 +4,8 @@
 # them in credhub.
 #
 # PLEASE put these in credhub!
+cf_api:
+cf_user:
+cf_password:
+cf_org:
+cf_space:
