@@ -43,6 +43,7 @@ Understand:
 * automation for space scoped broker lifecycle
 * how apps interact with service instances (broker is not involved)
 * lifecycle interaction between user, broker, app, and service instances (diagram)
+* you can purge service offerings and instances (useful in dev when the broker isn't functioning or available)
 
 Experience:
 * registering a space scoped broker w/ Cloud Controller
@@ -62,3 +63,34 @@ Maybe:
 * app sec groups
 * writing your own broker (beyond)
 * best practices on space management for brokers/apps
+
+## Learning Path (WIP)
+
+This is a rough outline/flow.  It is a work in progress (WIP)!
+
+1. What is a broker?
+  * Standardized API so you can see what is available, provision/deprovision, bind/unbind
+  * Scope: system vs space
+1. Deploy the broker as an app
+  * Where can a broker live? And why is should be in CF if possible.
+1. Register space-scoped broker & make plans available
+  * SpaceDeveloper role vs. CF Admin
+  * View in Marketplace CLI
+  * View in Stratos
+1. Provision an instance
+1. Bind to an app
+  * VCAP_SERVICES
+  * Dashboards
+1. Unbind
+1. Deprovision
+1. Remove the broker
+
+### Beyond
+
+1. Share svc instances
+
+1. Best practices on space management
+
+1. Automation
+
+1. Custom brokers & OSBAPI
