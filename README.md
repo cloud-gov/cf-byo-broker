@@ -6,6 +6,8 @@ The goal of this effort is to deliver documentation and training which will show
 
 ## Project Resources
 
+**Wiki**: https://github.com/resilientscale/cg-customer-broker/wiki
+
 **Concourse CI**: 18f team on https://ci.aws.rscale.io
 
 **Pivotal Tracker**: https://www.pivotaltracker.com/projects/2233580
