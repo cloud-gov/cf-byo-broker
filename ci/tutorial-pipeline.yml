@@ -15,6 +15,5 @@ jobs:
 - name: lazy
   plan:
   - get: cg-customer-broker
-    trigger: true
   - task: tell-it-like-it-is
     file: cg-customer-broker/ci/tasks/lazy.yml
