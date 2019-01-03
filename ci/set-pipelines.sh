@@ -10,4 +10,4 @@ fi
 target=$1
 this_directory=`dirname "$0"`
 
-fly -t ${target} set-pipeline -p cg-customer-broker-tutorial ${this_directory}/tutorial-pipeline.yml
+fly -t ${target} set-pipeline -p cg-customer-broker-tutorial -c ${this_directory}/tutorial-pipeline.yml
