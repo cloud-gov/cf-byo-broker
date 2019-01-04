@@ -1,8 +1,8 @@
 ---
 
 cf-params: &cf-params
-      CF_API_URL: ((cf_api))
-      CF_USERNAME: ((cf_user))
+      CF_API: ((cf_api))
+      CF_USER: ((cf_user))
       CF_PASSWORD: ((cf_password))
       CF_ORG: ((cf_org))
       CF_SPACE: ((cf_space))
@@ -23,7 +23,8 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry-incubator/stratos.git
-    branch: tags/stable
+    tag_filter: stable
+    branch: v2-master
     depth: 1
 
 jobs:
