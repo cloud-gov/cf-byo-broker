@@ -1,0 +1,14 @@
+# This file is provided as a reference of the values
+# expected for this pipeline.  You *could* pass these
+# into fly as inputs, but we recommend instead setting
+# them in credhub.
+#
+# PLEASE put these in credhub!
+cf_api:
+cf_user:
+cf_password:
+cf_org:
+cf_space:
+
+stratos_appname:
+stratos_hostname:
