@@ -1,18 +1,5 @@
 ---
 
-cf-params: &cf-params
-      CF_API: ((cf_api))
-      CF_USER: ((cf_user))
-      CF_PWD: ((cf_password))
-      CF_ORG: ((cf_org))
-      CF_SPACE: ((cf_space))
-
-names: &names
-      BROKER_APPNAME: broker
-      STRATOS_APPNAME: stratos
-      CONSUMER_APPNAME: consumer
-      SERVICE_INSTANCE_NAME: consumer-db
-
 # hostnames: &hostnames
 #       BROKER_HOSTNAME: gcp-broker
 #       STRATOS_HOSTNAME: stratos-console
@@ -45,7 +32,16 @@ jobs:
   plan:
   - get: cg-customer-broker
     passed: [deploy-broker]
+    trigger: true
   - task: cleanup
     file: cg-customer-broker/ci/tasks/cleanup.yml
-    params: *cf-params
-      *names
+    params:
+      CF_API: ((cf_api))
+      CF_USER: ((cf_user))
+      CF_PWD: ((cf_password))
+      CF_ORG: ((cf_org))
+      CF_SPACE: ((cf_space))
+      BROKER_APPNAME: broker
+      STRATOS_APPNAME: stratos
+      CONSUMER_APPNAME: consumer
+      SERVICE_INSTANCE_NAME: consumer-db
