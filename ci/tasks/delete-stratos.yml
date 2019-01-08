@@ -9,7 +9,6 @@ image_resource:
 
 inputs:
 - name: cg-customer-broker
-- name: stratos
 
 run:
   path: cg-customer-broker/ci/tasks/delete-stratos.sh
