@@ -1,5 +1,23 @@
 ---
 
+cf-params: &cf-params
+      CF_API: ((cf_api))
+      CF_USER: ((cf_user))
+      CF_PWD: ((cf_password))
+      CF_ORG: ((cf_org))
+      CF_SPACE: ((cf_space))
+
+names: &names
+      BROKER_APPNAME: broker
+      STRATOS_APPNAME: stratos
+      CONSUMER_APPNAME: consumer
+      SERVICE_INSTANCE_NAME: consumer-db
+
+# hostnames: &hostnames
+#       BROKER_HOSTNAME: gcp-broker
+#       STRATOS_HOSTNAME: stratos-console
+#       CONSUMER_HOSTNAME: gcp-consumer
+
 resources:
 
 - name: cg-customer-broker
@@ -9,11 +27,25 @@ resources:
     branch: master
     depth: 1
 
+# - name: broker
+
 jobs:
 
-# REMOVE WHEN THE REAL WORK STARTS!
-- name: lazy
+- name: deploy-broker
+  serial_groups: [keep-it-simple]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+    # - get: broker
+  - task: lazy
+    file: cg-customer-broker/ci/tasks/lazy.yml
+
+- name: cleanup
+  serial_groups: [keep-it-simple]
   plan:
   - get: cg-customer-broker
-  - task: tell-it-like-it-is
-    file: cg-customer-broker/ci/tasks/lazy.yml
+    passed: [deploy-broker]
+  - task: cleanup
+    file: cg-customer-broker/ci/tasks/cleanup.yml
+    params: *cf-params
+      *names
