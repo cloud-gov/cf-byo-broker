@@ -10,17 +10,32 @@ The services you see in the marketplace are likely system-wide; brokers are inst
 
 ## Deploying a Broker as an App
 
+Deploying a broker as an application is the same as deploying any application to Cloud Foundry. It is just a `cf push`.
 
-## Creating a Space Scoped Broker
+Ex. `cf push my-service-broker`
 
-### Register
+## Registering a Space Scoped Broker
+
+Once the broker application is running, it is time to register it as a service broker with Cloud Foundry. This is done using `cf create-service-broker` with the `--space-scope` options.
+
+Ex. `cf create-service-broker my-service-broker some-username some-password https://my-service-broker.somedomain.com`
 
 ### Viewing in the Marketplace
 
+Registering the service broker with Cloud Foundry adds it to the marketplace. The marketplace is the services available to an application. Executing `cf marketplace` displays a list of the services. Since the service broker that was just added is a spaced scoped broker, this will only show up in the marketplace if you are targeted at the appropriate space.
+
 ## Using the Broker
+
+Using a broker involves requesting the broker to provision service instances and then binding applications to those service instances. ??? Need an example where a service instance would be used by multiple applications to show why there's a seperation between creating the service instance and binding to it. ???
 
 ### Provisioning
 
+`cf create-service my-service-broker my-service-plan my-service-instance`
+
 ### Binding
 
+`cf bind-service my-app my-service-broker`
+
 ### Cleaning Up
+
+In a service broker environment there are two distinct areas. The instances which the service broker creates and the service broker itself. 
