@@ -26,13 +26,17 @@ Registering the service broker with Cloud Foundry adds it to the marketplace. Th
 
 ## Using the Broker
 
-Using a broker involves requesting the broker to provision service instances and then binding applications to those service instances. ??? Need an example where a service instance would be used by multiple applications to show why there's a seperation between creating the service instance and binding to it. ???
+The first step in using the broker is to provision an instance of the service, then bind the application to the service instance.
 
 ### Provisioning
 
-`cf create-service my-service-broker my-service-plan my-service-instance`
+Provisioning the service asks the broker to create an instance of the service based on a given service plan. Where a service could be the resiliency of the service. i.e. an HA version for production, or a minimal version for development.
+
+`cf create-service my-service-broker my-ha-service-plan my-service-instance`
 
 ### Binding
+
+Binding to the service asks the broker to provide the connection information to the application through the VCAP_SERVICE environment variable.
 
 `cf bind-service my-app my-service-broker`
 
