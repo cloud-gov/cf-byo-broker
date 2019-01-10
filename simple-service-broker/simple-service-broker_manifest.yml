@@ -1,0 +1,7 @@
+applications:
+- name: simple-service-broker
+  buildpacks:
+  - java_buildpack
+  instances: 1
+  memory: 750M
+  random-route: true

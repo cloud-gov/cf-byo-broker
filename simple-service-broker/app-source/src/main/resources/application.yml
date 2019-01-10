@@ -3,18 +3,18 @@ spring:
     openservicebroker:
       catalog:
         services:
-        - id: demo-service
-          name: demo-service
+        - id: simple-service
+          name: simple-service
           description: This service is for demonstration purposes. The same broker could advertise more than one service.
           bindable: true
           tags: [demo]
           plans:
-          - id: demo-plan-1
-            name: plan1
+          - id: simple-plan-1
+            name: simple-plan-1
             description: This is plan. Plans can be used to create tiers or levels of service. For example, plans could be used to provide different amounts of cpu, memory, capacity, number of concurrent connections, network performance, etc.
-          - id: demo-plan-2
-            name: plan2
-            description: This is another plan. Perhaps the service instance created according this plan has more capacity or capability than plan1.
+          - id: simple-plan-2
+            name: simple-plan-2
+            description: This is another plan. Perhaps the service instance created according this plan has more capacity or capability than simple-plan-1.
 
 basicAuth:
   username: admin

@@ -1,4 +1,4 @@
-package io.rscale.sampleservicebroker;
+package io.rscale.simpleservicebroker;
 
 import java.util.Map;
 

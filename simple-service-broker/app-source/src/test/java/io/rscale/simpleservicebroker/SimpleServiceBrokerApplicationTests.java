@@ -1,4 +1,4 @@
-package io.rscale.sampleservicebroker;
+package io.rscale.simpleservicebroker;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,11 +7,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SampleServiceBrokerApplicationTests {
+public class SimpleServiceBrokerApplicationTests {
 
 	@Test
 	public void contextLoads() {
 	}
 
 }
-

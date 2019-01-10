@@ -1,4 +1,4 @@
-package io.rscale.sampleservicebroker;
+package io.rscale.simpleservicebroker;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,14 +20,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${basicAuth.password}")
     private String password;
-   
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
           .withUser(username).password(passwordEncoder().encode(password))
           .authorities("ROLE_USER");
     }
- 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
           .and()
           .httpBasic();
     }
- 
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

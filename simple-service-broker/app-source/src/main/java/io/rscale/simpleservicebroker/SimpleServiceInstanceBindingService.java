@@ -1,4 +1,4 @@
-package io.rscale.sampleservicebroker;
+package io.rscale.simpleservicebroker;
 
 import org.springframework.cloud.servicebroker.model.binding.CreateServiceInstanceAppBindingResponse;
 import org.springframework.cloud.servicebroker.model.binding.CreateServiceInstanceBindingRequest;
