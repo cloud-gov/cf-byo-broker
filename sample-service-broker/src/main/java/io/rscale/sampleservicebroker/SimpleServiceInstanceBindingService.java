@@ -23,9 +23,9 @@ public class SimpleServiceInstanceBindingService implements ServiceInstanceBindi
 		// create credentials and store for later retrieval
 		//
 
-		String url = new String(/* build a URL to access the service instance */);
-		String bindingUsername = new String(/* create a user */);
-		String bindingPassword = new String(/* create a password */);
+		String url = new String("http://service-instance-endpoint.example.com");
+		String bindingUsername = new String("a-username");
+		String bindingPassword = new String("a-password");
 
 		return CreateServiceInstanceAppBindingResponse.builder()
 				.credentials("url", url)
@@ -59,9 +59,9 @@ public class SimpleServiceInstanceBindingService implements ServiceInstanceBindi
 		// retrieve the details of the specified service binding
 		//
 
-		String url = new String(/* retrieved URL */);
-		String bindingUsername = new String(/* retrieved user */);
-		String bindingPassword = new String(/* retrieved password */);
+		String url = new String("http://service-instance-endpoint.example.com");
+		String bindingUsername = new String("a-username");
+		String bindingPassword = new String("a-password");
 
 		return GetServiceInstanceAppBindingResponse.builder()
 				.credentials("username", bindingUsername)

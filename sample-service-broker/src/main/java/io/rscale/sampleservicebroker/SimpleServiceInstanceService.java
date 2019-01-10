@@ -31,7 +31,7 @@ public class SimpleServiceInstanceService implements ServiceInstanceService {
 		// provisioning of all necessary resources
 		//
 
-		String dashboardUrl = new String(/* construct a dashboard URL */);
+		String dashboardUrl = new String("https://service-instance-dashboard.example.com");
 
 		return CreateServiceInstanceResponse.builder()
 				.dashboardUrl(dashboardUrl)
