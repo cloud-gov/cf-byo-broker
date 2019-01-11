@@ -3,7 +3,7 @@
 set +x
 set -e
 
-. ./common.sh
+. cg-customer-broker/ci/tasks/common.sh
 
 broker_route=$(get_route $BROKER_APPNAME)
 
