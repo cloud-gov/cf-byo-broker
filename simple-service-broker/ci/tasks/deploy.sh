@@ -3,7 +3,7 @@
 set +x
 set -e
 
-cf login -a $CF_API -u $CF_USER -p $CF_PWD -o $CF_ORG -s $CF_SPACE
+. ../../ci/tasks/common.sh
 
 pushd cg-customer-broker/simple-service-broker/app-source
   ./gradlew assemble
