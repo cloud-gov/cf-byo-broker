@@ -3,7 +3,7 @@
 set +x
 set -e
 
-. ../../../ci/tasks/common.sh
+. cg-customer-broker/ci/tasks/common.sh
 
 pushd cg-customer-broker/simple-service-broker/app-source
   ./gradlew assemble
