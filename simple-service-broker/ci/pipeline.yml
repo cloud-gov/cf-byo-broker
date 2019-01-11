@@ -1,0 +1,54 @@
+---
+
+cf-params: &cf-params
+      CF_API: ((cf_api))
+      CF_USER: ((cf_user))
+      CF_PWD: ((cf_password))
+      CF_ORG: ((cf_org))
+      CF_SPACE: ((cf_space))
+
+names: &names
+      BROKER_APPNAME: simple-service-broker
+      STRATOS_APPNAME: stratos
+      CONSUMER_APPNAME: simple-service-consumer
+      SERVICE_INSTANCE_NAME: simple-service-instance
+
+resources:
+
+- name: cg-customer-broker
+  type: git
+  source:
+    uri: https://github.com/resilientscale/cg-customer-broker.git
+    branch: master
+    depth: 1
+    paths: [simple-service-broker/*, ci/tasks/cleanup.*]
+
+jobs:
+
+- name: deploy-broker
+  serial_groups: [simple]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+      trigger: true
+  - task: deploy
+    file: cg-customer-broker/simple-service-broker/ci/tasks/deploy.yml
+    params: *cf-params
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/cleanup.yml
+      params:
+        << : *cf-params
+        << : *names
+
+- name: cleanup
+  serial_groups: [simple]
+  plan:
+  - get: cg-customer-broker
+    passed: [deploy-broker]
+    trigger: true
+  - task: cleanup
+    file: cg-customer-broker/ci/tasks/cleanup.yml
+    params:
+      << : *cf-params
+      << : *names
