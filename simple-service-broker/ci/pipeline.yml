@@ -41,7 +41,7 @@ resources:
     uri: https://github.com/resilientscale/cg-customer-broker.git
     branch: master
     depth: 1
-    paths: [simple-service-broker/*, ci/tasks/cleanup.*]
+    paths: [simple-service-broker/*, ci/tasks/cleanup.*, ci/tasks/curl-catalog.*]
 
 jobs:
 
