@@ -131,8 +131,6 @@ At this point, your broker should be registered with Cloud Foundry.  You can che
   simple-broker   https://simple-service-broker-boisterous-warthog.cfapps.io
   ```
 
-
-
 ### Viewing in the Marketplace
 
 At this point you should see the service offering listed in the marketplace.
@@ -158,7 +156,7 @@ At this point you should see the service offering listed in the marketplace.
 
 If you have the Stratos UI available to you, you can also see the marketplace via Stratos.
 
-*
+* 
 
 
 ## Using the Broker

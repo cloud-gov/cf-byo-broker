@@ -1,5 +1,8 @@
 ---
 
+broker-name: &broker-name
+      BROKER_APPNAME: simple-service-broker
+
 cf-params: &cf-params
       CF_API: ((cf_api))
       CF_USER: ((cf_user))
@@ -8,10 +11,18 @@ cf-params: &cf-params
       CF_SPACE: ((cf_space))
 
 names: &names
-      BROKER_APPNAME: simple-service-broker
-      STRATOS_APPNAME: stratos
-      CONSUMER_APPNAME: simple-service-consumer
-      SERVICE_INSTANCE_NAME: simple-service-instance
+      << : *broker-name
+      STRATOS_APPNAME: ((stratos_appname)
+      CONSUMER_APPNAME: ((consumer_appname))
+      SERVICE_INSTANCE_NAME: ((service_instance_name))
+
+broker-credentials: &broker-credentials
+      BROKER_USERNAME: ((broker_username))
+      BROKER_PASSWORD: ((broker_password))
+
+broker-service-info: &broker-service-info
+      BROKER_SERVICE_NAME: simple-service
+      BROKER_PLAN_NAME: simple-plan-1
 
 resources:
 
@@ -34,6 +45,27 @@ jobs:
   - task: deploy
     file: cg-customer-broker/simple-service-broker/ci/tasks/deploy.yml
     params: *cf-params
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/cleanup.yml
+      params:
+        << : *cf-params
+        << : *names
+
+- name: fetch-catalog
+  serial_groups: [simple]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+      trigger: true
+      passed: [deploy-broker]
+  - task: fetch-catalog
+    file: cg-customer-broker/ci/tasks/fetch-catalog.yml
+    params:
+      << : *broker-name
+      << : *broker-service-info
+      << : *cf-params
+      << : *broker-credentials
     on_failure: &cleanup-task
       task: cleanup
       file: cg-customer-broker/ci/tasks/cleanup.yml

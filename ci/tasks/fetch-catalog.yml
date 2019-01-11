@@ -1,0 +1,26 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: rscale/cf-cli
+    tag: 'latest'
+
+inputs:
+- name: cg-customer-broker
+
+run:
+  path: cg-customer-broker/ci/tasks/fetch-catalog.sh
+
+params:
+  CF_API:
+  CF_USER:
+  CF_PWD:
+  CF_ORG:
+  CF_SPACE:
+  BROKER_APPNAME:
+  BROKER_USERNAME:
+  BROKER_PASSWORD:
+  BROKER_SERVICE_NAME:
+  BROKER_PLAN_NAME:

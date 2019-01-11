@@ -9,3 +9,11 @@ cf_user:
 cf_password:
 cf_org:
 cf_space:
+
+broker_username:
+broker_password:
+
+broker_appname:
+stratos_appname:
+consumer_appname:
+service_instance_name:
