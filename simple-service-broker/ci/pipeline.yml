@@ -3,6 +3,15 @@
 broker-name: &broker-name
       BROKER_APPNAME: simple-service-broker
 
+stratos-name: &stratos-name
+      STRATOS_APPNAME: stratos
+
+consumer-name: &consumer-name
+      CONSUMER_APPNAME: consumer
+
+service-instance-name: &service-instance-name
+      SERVICE_INSTANCE_NAME: simple-service-instance
+
 cf-params: &cf-params
       CF_API: ((cf_api))
       CF_USER: ((cf_user))
@@ -12,9 +21,9 @@ cf-params: &cf-params
 
 names: &names
       << : *broker-name
-      STRATOS_APPNAME: ((stratos_appname)
-      CONSUMER_APPNAME: ((consumer_appname))
-      SERVICE_INSTANCE_NAME: ((service_instance_name))
+      << : *stratos-name
+      << : *consumer-name
+      << : *service-instance-name    
 
 broker-credentials: &broker-credentials
       BROKER_USERNAME: ((broker_username))
@@ -77,7 +86,7 @@ jobs:
   serial_groups: [simple]
   plan:
   - get: cg-customer-broker
-    passed: [deploy-broker]
+    passed: [fetch-catalog]
     trigger: true
   - task: cleanup
     file: cg-customer-broker/ci/tasks/cleanup.yml
