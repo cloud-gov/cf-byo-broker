@@ -74,42 +74,42 @@ jobs:
         << : *cf-params
         << : *names
 
-# - name: create-service-broker
-#   serial_groups: [simple]
-#   plan:
-#   - aggregate:
-#     - get: cg-customer-broker
-#       trigger: true
-#       passed: [deploy-broker]
-#   - task: create-service-broker
-#     file: cg-customer-broker/ci/tasks/create-service-broker.yml
-#     params:
-#       << : *cf-params
-#       << : *broker-name
-#       << : *broker-credentials
-#     on_failure: &cleanup-task
-#       task: cleanup
-#       file: cg-customer-broker/ci/tasks/cleanup.yml
-#       params:
-#         << : *cf-params
-#         << : *names
-#   - task: service-brokers
-#     file: cg-customer-broker/ci/tasks/service-brokers.yml
-#     params:
-#       << : *broker-name
-#       << : *cf-params
-#     on_failure: &cleanup-task
-#       task: cleanup
-#       file: cg-customer-broker/ci/tasks/cleanup.yml
-#       params:
-#         << : *cf-params
-#         << : *names
+- name: create-service-broker
+  serial_groups: [simple]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+      trigger: true
+      passed: [deploy-broker]
+  - task: create-service-broker
+    file: cg-customer-broker/ci/tasks/create-service-broker.yml
+    params:
+      << : *cf-params
+      << : *broker-name
+      << : *broker-credentials
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/cleanup.yml
+      params:
+        << : *cf-params
+        << : *names
+  - task: service-brokers
+    file: cg-customer-broker/ci/tasks/service-brokers.yml
+    params:
+      << : *broker-name
+      << : *cf-params
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/cleanup.yml
+      params:
+        << : *cf-params
+        << : *names
 
 - name: cleanup
   serial_groups: [simple]
   plan:
   - get: cg-customer-broker
-    passed: [deploy-broker]
+    passed: [create-service-broker]
     trigger: true
   - task: cleanup
     file: cg-customer-broker/ci/tasks/cleanup.yml
