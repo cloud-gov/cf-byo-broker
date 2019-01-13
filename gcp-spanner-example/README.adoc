@@ -1,0 +1,15 @@
+= Spring Cloud GCP Cloud Spanner Starter Example
+
+This code example demonstrates how to read and write POJOs from Google Cloud Spanner using the Spring.
+The example was originally copied from the https://github.com/spring-cloud/spring-cloud-gcp[Spring Cloud GCP Repo]
+
+This example creates a trades database and populates it with examples.
+
+You can retrieve all `Trade` objects in the repository by using
+`curl http://<app url>/trades`, or any specific trade via
+`curl http://<app url>/trades/<trader_id>,<trade_id>`.
+
+This is achieved using https://projects.spring.io/spring-data-rest/:[Spring Data REST] and the `@RepositoryRestResource` annotation.
+
+You can also write trades using
+`curl -XPOST -H"Content-Type: application/json" -d@test.json http://<app url>/trades/` where the file `test.json` holds the JSON representation of a `Trade` object.
