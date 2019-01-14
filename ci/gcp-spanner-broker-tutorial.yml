@@ -23,12 +23,12 @@ jobs:
   - aggregate:
     - get: cg-customer-broker
     - get: gcp-service-broker
-  - task: lazy
+  - task: create-gcp-service-broker
     file: cg-customer-broker/ci/tasks/deploy-gcp-service-broker.yml
     params:
-      CF_API: ((concourse/18f/gcp-spanner-broker-tutorial/cf_api))
-      CF_USER: ((concourse/18f/gcp-spanner-broker-tutorial/cf_user))
-      CF_PWD: ((concourse/18f/gcp-spanner-broker-tutorial/cf_password))
-      CF_ORG: ((concourse/18f/gcp-spanner-broker-tutorial/cf_org))
-      CF_SPACE: ((concourse/18f/gcp-spanner-broker-tutorial/cf_space))
-      ROOT_SERVICE_ACCOUNT_JSON: ((concourse/18f/gcp-spanner-broker-tutorial/root-service-account-json))
+      CF_API: ((cf_api))
+      CF_USER: ((cf_user))
+      CF_PWD: ((cf_password))
+      CF_ORG: ((cf_org))
+      CF_SPACE: ((cf_space))
+      ROOT_SERVICE_ACCOUNT_JSON: ((root_service_account_json))
