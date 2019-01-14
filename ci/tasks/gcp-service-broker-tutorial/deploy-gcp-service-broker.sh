@@ -10,7 +10,7 @@ cd gcp-service-broker
 cat << EOF > manifest.yml
 ---
 applications:
-  - name: gcp-service-broker-ci
+  - name: $GCP_BROKER_APP_NAME
     product_version: "4.1.0"
     metadata_version: "1.0"
     label: 'GCP Service Broker'
@@ -29,7 +29,5 @@ applications:
       DB_PASSWORD: micropdb
 
 EOF
-
-cat manifest.yml
 
 cf p

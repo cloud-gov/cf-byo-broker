@@ -1,4 +1,14 @@
 ---
+gcp-broker-app-name: &gcp-broker-app-name
+      GCP_BROKER_APP_NAME: gcp-service-broker-ci
+
+cf-params: &cf-params
+      CF_API: ((cf_api))
+      CF_USER: ((cf_user))
+      CF_PWD: ((cf_password))
+      CF_ORG: ((cf_org))
+      CF_SPACE: ((cf_space))
+
 resources:
 
 - name: cg-customer-broker
@@ -24,11 +34,26 @@ jobs:
     - get: cg-customer-broker
     - get: gcp-service-broker
   - task: deploy-gcp-service-broker
-    file: cg-customer-broker/ci/tasks/deploy-gcp-service-broker.yml
+    file: cg-customer-broker/ci/tasks/gcp-spanner-broker-tutorial/deploy-gcp-service-broker.yml
     params:
-      CF_API: ((cf_api))
-      CF_USER: ((cf_user))
-      CF_PWD: ((cf_password))
-      CF_ORG: ((cf_org))
-      CF_SPACE: ((cf_space))
+      << : *cf-params
       ROOT_SERVICE_ACCOUNT_JSON: ((root_service_account_json))
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/cleanup.yml
+      params:
+        << : *cf-params
+        << : *gcp-broker-app-name
+
+- name: cleanup
+  serial_groups: [keep-it-simple]
+  plan:
+  - get: cg-customer-broker
+    passed: [deploy-gcp-service-broker]
+    trigger: true
+  - task: cleanup
+    file: cg-customer-broker/ci/tasks/gcp-spanner-broker-tutorial/cleanup.yml
+    params:
+      << : *cf-params
+      << : *gcp-broker-app-name
+    
