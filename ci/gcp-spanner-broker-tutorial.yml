@@ -34,9 +34,10 @@ jobs:
     - get: cg-customer-broker
     - get: gcp-service-broker
   - task: deploy-gcp-service-broker
-    file: cg-customer-broker/ci/tasks/gcp-spanner-broker-tutorial/deploy-gcp-service-broker.yml
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/deploy-gcp-service-broker.yml
     params:
       << : *cf-params
+      << : *gcp-broker-app-name
       ROOT_SERVICE_ACCOUNT_JSON: ((root_service_account_json))
     on_failure: &cleanup-task
       task: cleanup
