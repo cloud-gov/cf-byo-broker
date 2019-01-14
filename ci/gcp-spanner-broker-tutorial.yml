@@ -1,0 +1,34 @@
+---
+resources:
+
+- name: cg-customer-broker
+  type: git
+  source:
+    uri: https://github.com/resilientscale/cg-customer-broker.git
+    branch: master
+    depth: 1
+
+- name: gcp-service-broker
+  type: git
+  source:
+    uri: https://github.com/GoogleCloudPlatform/gcp-service-broker.git
+    branch: master
+    depth: 1
+
+jobs:
+
+- name: deploy-gcp-service-broker
+  serial_groups: [keep-it-simple]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+    - get: gcp-service-broker
+  - task: lazy
+    file: cg-customer-broker/ci/tasks/deploy-gcp-service-broker.yml
+    params:
+      CF_API: ((concourse/18f/gcp-spanner-broker-tutorial/cf_api))
+      CF_USER: ((concourse/18f/gcp-spanner-broker-tutorial/cf_user))
+      CF_PWD: ((concourse/18f/gcp-spanner-broker-tutorial/cf_password))
+      CF_ORG: ((concourse/18f/gcp-spanner-broker-tutorial/cf_org))
+      CF_SPACE: ((concourse/18f/gcp-spanner-broker-tutorial/cf_space))
+      ROOT_SERVICE_ACCOUNT_JSON: ((concourse/18f/gcp-spanner-broker-tutorial/root-service-account-json))
