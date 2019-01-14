@@ -21,7 +21,7 @@ applications:
     env:
       GOPACKAGENAME: github.com/GoogleCloudPlatform/gcp-service-broker
       GOVERSION: go1.10
-      ROOT_SERVICE_ACCOUNT_JSON: $ROOT_SERVICE_ACCOUNT_JSON
+      ROOT_SERVICE_ACCOUNT_JSON: '$ROOT_SERVICE_ACCOUNT_JSON'
       SECURITY_USER_NAME: secuser
       SECURITY_USER_PASSWORD: secpass
       DB_HOST: 104.197.57.63
