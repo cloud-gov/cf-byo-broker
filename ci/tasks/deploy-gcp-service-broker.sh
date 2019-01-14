@@ -7,8 +7,8 @@ set -e
 
 cd gcp-service-broker
 
-cat <<EOF
+cat <<EOF > manifest.yml
 stuff
-EOF > manifest.yml
+EOF 
 
 cat manifest.yml
