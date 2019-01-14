@@ -5,4 +5,10 @@ set -e
 
 . cg-customer-broker/ci/tasks/common.sh
 
-echo $ROOT_SERVICE_ACCOUNT_JSON
+cd gcp-service-broker
+
+cat <<EOF
+stuff
+EOF > manifest.yml
+
+cat manifest.yml

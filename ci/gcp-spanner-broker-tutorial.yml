@@ -23,7 +23,7 @@ jobs:
   - aggregate:
     - get: cg-customer-broker
     - get: gcp-service-broker
-  - task: create-gcp-service-broker
+  - task: deploy-gcp-service-broker
     file: cg-customer-broker/ci/tasks/deploy-gcp-service-broker.yml
     params:
       CF_API: ((cf_api))
