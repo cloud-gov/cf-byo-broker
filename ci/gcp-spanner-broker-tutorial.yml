@@ -1,6 +1,11 @@
 ---
-gcp-broker-app-name: &gcp-broker-app-name
+gcp-broker-manifest-params: &gcp-broker-manifest-params
       GCP_BROKER_APP_NAME: gcp-service-broker-ci
+      SECURITY_USER_NAME: ((security_user_name))
+      SECURITY_USER_PASSWORD: ((security_user_password))
+      DB_HOST: ((db_host))
+      DB_USERNAME: ((db_username))
+      DB_PASSWORD: ((db_password))
 
 cf-params: &cf-params
       CF_API: ((cf_api))
@@ -38,6 +43,7 @@ jobs:
     params:
       << : *cf-params
       << : *gcp-broker-app-name
+      << : *gcp-broker-manifest-params
       ROOT_SERVICE_ACCOUNT_JSON: ((root_service_account_json))
     on_failure: &cleanup-task
       task: cleanup
