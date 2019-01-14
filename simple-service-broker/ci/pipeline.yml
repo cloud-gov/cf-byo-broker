@@ -31,7 +31,7 @@ broker-credentials: &broker-credentials
 
 broker-service-info: &broker-service-info
       BROKER_SERVICE_NAME: simple-service
-      BROKER_PLAN_NAME: simple-plan-1
+      BROKER_PLAN_NAME: simple-service-plan-1
 
 resources:
 
