@@ -9,6 +9,6 @@ cd gcp-service-broker
 
 cat << EOF > manifest.yml
 stuff
-EOF 
+EOF
 
 cat manifest.yml
