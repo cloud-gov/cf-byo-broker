@@ -10,7 +10,7 @@ cd gcp-service-broker
 cat << EOF > manifest.yml
 ---
 applications:
-  - name: gcp-service-broker
+  - name: gcp-service-broker-ci
     product_version: "4.1.0"
     metadata_version: "1.0"
     label: 'GCP Service Broker'
