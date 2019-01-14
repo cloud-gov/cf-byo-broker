@@ -52,7 +52,7 @@ jobs:
     passed: [deploy-gcp-service-broker]
     trigger: true
   - task: cleanup
-    file: cg-customer-broker/ci/tasks/gcp-spanner-broker-tutorial/cleanup.yml
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
     params:
       << : *cf-params
       << : *gcp-broker-app-name
