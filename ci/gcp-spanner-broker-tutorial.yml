@@ -41,7 +41,7 @@ jobs:
       ROOT_SERVICE_ACCOUNT_JSON: ((root_service_account_json))
     on_failure: &cleanup-task
       task: cleanup
-      file: cg-customer-broker/ci/tasks/cleanup.yml
+      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
       params:
         << : *cf-params
         << : *gcp-broker-app-name
