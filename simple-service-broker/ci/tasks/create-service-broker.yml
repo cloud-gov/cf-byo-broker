@@ -11,7 +11,7 @@ inputs:
 - name: cg-customer-broker
 
 run:
-  path: cg-customer-broker/ci/tasks/service-brokers.sh
+  path: cg-customer-broker/simple-service-broker/ci/tasks/create-service-broker.sh
 
 params:
   CF_API:
@@ -20,3 +20,7 @@ params:
   CF_ORG:
   CF_SPACE:
   BROKER_APPNAME:
+  BROKER_USERNAME:
+  BROKER_PASSWORD:
+  BROKER_SERVICE_NAME:
+  BROKER_PLAN_NAME:
