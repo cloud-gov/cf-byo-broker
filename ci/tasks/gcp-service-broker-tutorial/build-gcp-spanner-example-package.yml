@@ -11,6 +11,10 @@ inputs:
 - name: gcp-spanner-example
 - name: cg-customer-broker
 
+outputs:
+- name: gcp-spanner-tutorial-app
+  path: gcp-spanner-example/zip-files/gcp-spanner-tutorial-app.zip
+
 run:
   path: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/build-gcp-spanner-example-package.sh
 
