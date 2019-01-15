@@ -9,6 +9,7 @@ image_resource:
 
 inputs:
 - name: gcp-spanner-example
+- name: cg-customer-broker
 
 run:
   path: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/
