@@ -9,9 +9,10 @@ image_resource:
 
 inputs:
 - name: cg-customer-broker
+- name: stratos
 
 run:
-  path: cg-customer-broker/ci/tasks/delete-stratos.sh
+  path: cg-customer-broker/simple-service-broker/ci/tasks/deploy-stratos.sh
 
 params:
   CF_API:
