@@ -21,7 +21,8 @@ jobs:
 - name: build-gcp-spanner-example-package
   serial_groups: [keep-it-simple]
   plan:
-  - get: gcp-spanner-example
-  - get: cg-customer-broker
+  - aggregate:
+    - get: gcp-spanner-example
+    - get: cg-customer-broker
   - task: build-gcp-spanner-example-package
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/build-gcp-spanner-example-package.yml
