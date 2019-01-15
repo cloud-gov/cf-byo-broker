@@ -1,12 +1,25 @@
 ---
-gcp-broker-manifest-params: &gcp-broker-manifest-params
+# There are some tasks that just need the broker name
+gcp-broker-app-name: &gcp-broker-app-name
       GCP_BROKER_APP_NAME: gcp-service-broker-ci
+
+# This are the creds used by the broker app when creating the service broker.
+gcp-broker-app-creds: &gcp-broker-app-creds
       SECURITY_USER_NAME: ((security_user_name))
       SECURITY_USER_PASSWORD: ((security_user_password))
+
+# Variable set in the broker manifest
+gcp-broker-manifest-params: &gcp-broker-manifest-params
+      << : *gcp-broker-app-name
+      << : *gcp-broker-app-creds
       DB_HOST: ((db_host))
       DB_USERNAME: ((db_username))
       DB_PASSWORD: ((db_password))
 
+gcp-service-broker-name: &gcp-service-broker-name
+      GCP_SERVICE_BROKER_NAME: gcp-service-broker
+
+# Cloud Foundry parameters
 cf-params: &cf-params
       CF_API: ((cf_api))
       CF_USER: ((cf_user))
@@ -32,6 +45,7 @@ resources:
 
 jobs:
 
+# Deploy the service broker as an application
 - name: deploy-gcp-service-broker
   serial_groups: [keep-it-simple]
   plan:
@@ -42,7 +56,6 @@ jobs:
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/deploy-gcp-service-broker.yml
     params:
       << : *cf-params
-      << : *gcp-broker-app-name
       << : *gcp-broker-manifest-params
       ROOT_SERVICE_ACCOUNT_JSON: ((root_service_account_json))
     on_failure: &cleanup-task
@@ -52,15 +65,29 @@ jobs:
         << : *cf-params
         << : *gcp-broker-app-name
 
-- name: cleanup
+# Create a service broker using the app deployed above.
+- name: create-service-broker
   serial_groups: [keep-it-simple]
   plan:
   - get: cg-customer-broker
     passed: [deploy-gcp-service-broker]
-    trigger: true
-  - task: cleanup
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+  - task: create-service-broker
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-service-broker.yml
     params:
       << : *cf-params
       << : *gcp-broker-app-name
+      << : *gcp-broker-app-creds
+
+# Cleanup all resources created by the pipeline.
+#- name: cleanup
+#  serial_groups: [keep-it-simple]
+#  plan:
+#  - get: cg-customer-broker
+#    passed: [create-service-broker]
+#    trigger: true
+#  - task: cleanup
+#    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+#    params:
+#      << : *cf-params
+#      << : *gcp-broker-app-name
     
