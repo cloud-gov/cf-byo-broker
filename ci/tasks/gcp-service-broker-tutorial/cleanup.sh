@@ -13,5 +13,5 @@ set -e
 . cg-customer-broker/ci/tasks/common.sh
 
 # Delete the service broker and then the application backing the service broker.
-cf delete-service-broker $GCP_SERVICE_BROKER_NAME || echo "App could not be deleted: ${GCP_SERVICE_BROKER_NAME}"
+cf delete-service-broker $GCP_SERVICE_BROKER_NAME -f || echo "App could not be deleted: ${GCP_SERVICE_BROKER_NAME}"
 cf d -f $GCP_SERVICE_BROKER_APP_NAME  || echo "App could not be deleted: ${GCP_SERVICE_BROKER_APP_NAME}"
