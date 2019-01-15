@@ -12,13 +12,11 @@ set -e
 
 cd gcp-spanner-example
 
-#./mvnw package -DskipTests
+./mvnw package -DskipTests
 
 #
-#cp manifest.yml zip-files/.
-#cp target/spring-cloud-gcp-data-spanner-sample-1.1.0.BUILD-SNAPSHOT.jar zip-files/.
-#
+cp manifest.yml ../zip-files/.
+cp target/spring-cloud-gcp-data-spanner-sample-1.1.0.BUILD-SNAPSHOT.jar ../zip-files/.
+
 cd ../zip-files
-echo "test" > gcp-spanner-tutorial-app.zip
-ls -l
-#jar cMf gcp-spanner-tutorial-app.zip manifest.yml spring-cloud-gcp-data-spanner-sample-1.1.0.BUILD-SNAPSHOT.jar
+jar cMf gcp-spanner-tutorial-app.zip manifest.yml spring-cloud-gcp-data-spanner-sample-1.1.0.BUILD-SNAPSHOT.jar
