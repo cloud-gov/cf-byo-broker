@@ -2,7 +2,7 @@
 
 . cg-customer-broker/ci/tasks/common.sh
 
-offering_name=`cf m | grep ${BROKER_SERVICE_NAME}`
+offering_name=`cf marketplace | grep ${BROKER_SERVICE_NAME}`
 
 if [ -z $offering_name ]; then
   echo "Could not find service offering via 'cf m': Service offering name = ${BROKER_SERVICE_NAME}"
