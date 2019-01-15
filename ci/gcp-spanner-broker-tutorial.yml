@@ -70,8 +70,8 @@ jobs:
   serial_groups: [keep-it-simple]
   plan:
   - get: cg-customer-broker
-    passed: [deploy-gcp-service-broker]
-    trigger: true
+#    passed: [deploy-gcp-service-broker]
+#    trigger: true
   - task: create-service-broker
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-service-broker.yml
     params:
