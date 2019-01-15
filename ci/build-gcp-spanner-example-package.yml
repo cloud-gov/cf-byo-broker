@@ -1,0 +1,15 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: openjdc/8-slim
+    tag: latest
+
+inputs:
+- name: gcp-spanner-example
+
+run:
+  path: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/
+

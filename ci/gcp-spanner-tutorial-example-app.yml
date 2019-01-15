@@ -1,0 +1,19 @@
+---
+
+resources:
+
+- name: gcp-spanner-example
+  type: git
+  source:
+    uri: https://github.com/primetimesoftware/gcp-spanner-example.git
+    branch: master
+    depth: 1
+
+jobs:
+
+- name: build-gcp-spanner-example-package
+  serial_groups: [keep-it-simple]
+  plan:
+  - get: gcp-spanner-example
+  - task: build-gcp-spanner-example-package
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/build-gcp-spanner-example-package.yml
