@@ -107,21 +107,29 @@ You will see this broker exposes a single service called `simple-service` which 
 
 ## Registering a Space Scoped Broker
 
-Once the broker application is running, we can register it as a service broker with Cloud Foundry. If you are a Cloud Foundry admin, you can register a broker and make it available system wide. These brokers are referred to as `standard brokers`. However, if you aren't an admin you can still register a broker within a space provided you have the SpaceDeveloper role. These brokers are referred to as `space scoped brokers`
+Once the broker application is running, we can register it as a service broker with Cloud Foundry. If you are a Cloud Foundry admin, you can register a broker and make it available system wide. These brokers are referred to as `standard brokers`. However, if you aren't an admin you can still register a broker within a space provided you have the `SpaceDeveloper` role. These brokers are referred to as `space scoped brokers`
 
 > More information on roles in Cloud Foundry is availble here: https://docs.cloudfoundry.org/concepts/roles.html.
 
 * Use the `create-service-broker` command to register your broker with Cloud Foundry.
-  * `cf create-service-broker --help` shows we need to supply the following:
-    * `SERVICE_BROKER`: This is the name of the broker as referenced within Cloud Foundry.
-    * `USERNAME` & `PASSWORD`: Service brokers are protected by basic authentication. This broker's default username is `admin` and password is `secret`.
-    * `URL`: This is the route of your broker prefixed with `https://`.
-    * `--space-scoped`: This tells Cloud Foundry to register the broker only within your space. This allows you to add any broker to your space.
-  * Substituting your information, this should look something like:
 
-    ```
-    $ cf create-service-broker simple-service-broker admin secret https://<YOUR-ROUTE> --space-scoped
-    ```
+  ```
+  $ cf create-service-broker simple-service-broker admin secret https://<YOUR-BROKER-ROUTE> --space-scoped
+  ```
+
+  You should see output similar to:
+
+  ```
+  Creating service broker simple-service-broker in org 18f / space simple-service-broker-integration as sgreenberg@rscale.io...
+  OK
+  ```
+
+Let's break down the command:
+
+  * `simple-service-broker`: This is the name of the broker as referenced within Cloud Foundry. While this matches our app name, there is no relationship between the two values. Using the same name simply makes it easier for humans to reason over the relationship.
+  * `admin` and `secret` are the `USERNAME` & `PASSWORD` for the service broker. Providing these allows Cloud Foundry to authenticate to the broker.
+  * `https://<YOUR-BROKER-ROUTE>`: This is the route of your broker prefixed with `https://`.
+  * `--space-scoped`: This tells Cloud Foundry to register the broker only within your space. This allows you to add any broker to your space.
 
 ### Checking Your Work
 
@@ -131,7 +139,7 @@ At this point, your broker should be registered with Cloud Foundry.  You can che
   Getting service brokers as sgreenberg@rscale.io...
 
   name            url
-  simple-service-broker   https://simple-service-broker-boisterous-warthog.cfapps.io
+  simple-service-broker   https://simple-service-broker-humble-wallaby.cfapps.io
   ```
 
 ## Using the Broker
