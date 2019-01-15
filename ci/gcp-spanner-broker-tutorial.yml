@@ -19,6 +19,9 @@ gcp-service-broker-manifest-params: &gcp-service-broker-manifest-params
 gcp-service-broker-name: &gcp-service-broker-name
       GCP_SERVICE_BROKER_NAME: gcp-service-broker
 
+gcp-spanner-service-name: &gcp-spanner-service-name
+      GCP_SPANNER_SERVICE_NAME: gcp-spanner-service
+
 # Cloud Foundry parameters
 cf-params: &cf-params
       CF_API: ((cf_api))
@@ -43,6 +46,15 @@ resources:
     branch: master
     depth: 1
 
+- name: tutorial-s3-bucket
+  type: s3
+  source:
+    bucket: ((artifact_bucket))
+    region_name: ((artifact_bucket_region))
+    versioned_file: gcp-spanner-tutorial-app.zip
+    access_key_id: ((aws_access_key_id))
+    secret_access_key: ((aws_secret_access_key))
+
 jobs:
 
 # Deploy the service broker as an application
@@ -63,7 +75,6 @@ jobs:
       file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
       params:
         << : *cf-params
-        << : *gcp-service-broker-app-name
 
 # Create a service broker using the app deployed above.
 - name: create-service-broker
@@ -85,18 +96,43 @@ jobs:
       params:
         << : *cf-params
         << : *gcp-service-broker-app-name
-        <<: *gcp-service-broker-name
+        << : *gcp-service-broker-name
 
-# Cleanup all resources created by the pipeline.
-- name: cleanup
+# Exercise service broker with the example application
+- name: exercise-gcp-spanner-service-broker
   serial_groups: [keep-it-simple]
   plan:
-  - get: cg-customer-broker
-    passed: [create-service-broker]
-    trigger: true
-  - task: cleanup
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+  - aggregate:
+    - get: cg-customer-broker
+      passed: create-service-broker
+      trigger: true
+    - get: tutorial-s3-bucket
+  - task: exercise-gcp-spanner-service-broker
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-gcp-spanner-service-broker.yml
     params:
-      << : *cf-params
-      << : *gcp-service-broker-app-name
-      << : *gcp-service-broker-name
+      <<: *cf-params
+      <<: *gcp-service-broker-app-name
+      <<: *gcp-service-broker-name
+      <<: *gcp-spanner-service-name
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+      params:
+        << : *cf-params
+        << : *gcp-service-broker-app-name
+        << : *gcp-service-broker-name
+        << : *gcp-spanner-service-name
+
+# Cleanup all resources created by the pipeline.
+#- name: cleanup
+#  serial_groups: [keep-it-simple]
+#  plan:
+#  - get: cg-customer-broker
+#    passed: [create-service-broker]
+#    trigger: true
+#  - task: cleanup
+#    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+#    params:
+#      << : *cf-params
+#      << : *gcp-service-broker-app-name
+#      << : *gcp-service-broker-name
