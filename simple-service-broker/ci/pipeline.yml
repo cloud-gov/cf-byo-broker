@@ -9,9 +9,6 @@ stratos-name: &stratos-name
 stratos-hostname: &stratos-hostname
       STRATOS_HOSTNAME: stratos-simple-service-broker
 
-consumer-name: &consumer-name
-      CONSUMER_APPNAME: consumer
-
 service-instance-name: &service-instance-name
       SERVICE_INSTANCE_NAME: simple-service-instance
 
@@ -25,7 +22,6 @@ cf-params: &cf-params
 names: &names
       << : *broker-name
       << : *stratos-name
-      << : *consumer-name
       << : *service-instance-name
 
 broker-credentials: &broker-credentials
@@ -51,6 +47,14 @@ resources:
   source:
     uri: https://github.com/rscale-training/simple-service-broker.git
     branch: master
+    depth: 1
+
+- name: stratos
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry-incubator/stratos.git
+    tag_filter: stable
+    branch: v2-master
     depth: 1
 
 jobs:
@@ -170,3 +174,26 @@ jobs:
     params:
       << : *cf-params
       << : *names
+
+- name: deploy-stratos
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+    - get: stratos
+  - task: deploy-stratos
+    file: cg-customer-broker/simple-service-broker/ci/tasks/deploy-stratos.yml
+    params:
+      << : *cf-params
+      << : *stratos-name
+      << : *stratos-hostname
+
+- name: delete
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+    - get: stratos
+  - task: delete-stratos
+    file: cg-customer-broker/simple-service-brokerci/tasks/delete-stratos.yml
+    params:
+      << : *cf-params
+      << : *stratos-name

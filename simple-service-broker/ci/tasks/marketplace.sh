@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set +x
+set -e
+
 . cg-customer-broker/ci/tasks/common.sh
 
 offering_name=`cf marketplace | grep ${BROKER_SERVICE_NAME}`
