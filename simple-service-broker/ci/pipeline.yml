@@ -168,7 +168,7 @@ jobs:
   plan:
   - get: cg-customer-broker
     passed: [marketplace-via-cli]
-    trigger: true
+    # trigger: true
   - task: cleanup
     file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
     params:
