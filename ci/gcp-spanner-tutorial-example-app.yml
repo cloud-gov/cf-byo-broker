@@ -36,5 +36,5 @@ jobs:
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/build-gcp-spanner-example-package.yml
   - put: tutorial-s3-bucket
     params:
-      file: gcp-spanner-example/zip-files/gcp-spanner-tutorial-app.zip
+      file: zip-files/gcp-spanner-tutorial-app.zip
       acl: public-read
