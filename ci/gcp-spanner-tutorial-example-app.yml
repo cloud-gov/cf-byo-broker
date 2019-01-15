@@ -9,11 +9,19 @@ resources:
     branch: master
     depth: 1
 
+- name: cg-customer-broker
+  type: git
+  source:
+    uri: https://github.com/resilientscale/cg-customer-broker.git
+    branch: master
+    depth: 1
+
 jobs:
 
 - name: build-gcp-spanner-example-package
   serial_groups: [keep-it-simple]
   plan:
   - get: gcp-spanner-example
+  - get: cg-customer-broker
   - task: build-gcp-spanner-example-package
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/build-gcp-spanner-example-package.yml
