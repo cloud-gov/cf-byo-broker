@@ -13,3 +13,12 @@ set -e
 cd gcp-spanner-example
 
 ./mvnw package -DskipTests
+
+# Make a temporary directory to use for zipping the archive and manifest
+mkdir zip-files
+
+cp manifest.yml zip-files/.
+cp target/spring-cloud-gcp-data-spanner-sample-1.1.0.BUILD-SNAPSHOT.jar zip-files/.
+
+cd zip-files
+jar cMf gcp-spanner-tutorial.zip manifest.yml spring-cloud-gcp-data-spanner-sample-1.1.0.BUILD-SNAPSHOT.jar
