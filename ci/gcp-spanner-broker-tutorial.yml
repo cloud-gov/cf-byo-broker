@@ -1,17 +1,17 @@
 ---
 # There are some tasks that just need the broker name
-gcp-broker-app-name: &gcp-broker-app-name
-      GCP_BROKER_APP_NAME: gcp-service-broker-ci
+gcp-service-broker-app-name: &gcp-service-broker-app-name
+      GCP_SERVICE_BROKER_APP_NAME: gcp-service-broker-ci
 
 # This are the creds used by the broker app when creating the service broker.
-gcp-broker-app-creds: &gcp-broker-app-creds
+gcp-service-broker-app-creds: &gcp-service-broker-app-creds
       SECURITY_USER_NAME: ((security_user_name))
       SECURITY_USER_PASSWORD: ((security_user_password))
 
 # Variable set in the broker manifest
-gcp-broker-manifest-params: &gcp-broker-manifest-params
+gcp-service-broker-manifest-params: &gcp-service-broker-manifest-params
       << : *gcp-broker-app-name
-      << : *gcp-broker-app-creds
+      << : *gcp-service-broker-app-creds
       DB_HOST: ((db_host))
       DB_USERNAME: ((db_username))
       DB_PASSWORD: ((db_password))
@@ -56,7 +56,7 @@ jobs:
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/deploy-gcp-service-broker.yml
     params:
       << : *cf-params
-      << : *gcp-broker-manifest-params
+      << : *gcp-service-broker-manifest-params
       ROOT_SERVICE_ACCOUNT_JSON: ((root_service_account_json))
     on_failure: &cleanup-task
       task: cleanup
@@ -76,8 +76,8 @@ jobs:
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-service-broker.yml
     params:
       << : *cf-params
-      << : *gcp-broker-app-name
-      << : *gcp-broker-app-creds
+      << : *gcp-service-broker-app-name
+      << : *gcp-service-broker-app-creds
 
 # Cleanup all resources created by the pipeline.
 #- name: cleanup
@@ -90,5 +90,5 @@ jobs:
 #    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
 #    params:
 #      << : *cf-params
-#      << : *gcp-broker-app-name
+#      << : *gcp-service-broker-app-name
     
