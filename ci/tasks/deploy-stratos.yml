@@ -20,3 +20,4 @@ params:
   CF_PWD:
   CF_ORG:
   CF_SPACE:
+  STRATOS_APPNAME:
