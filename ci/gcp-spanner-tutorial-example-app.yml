@@ -16,6 +16,14 @@ resources:
     branch: master
     depth: 1
 
+- name: tutorial-s3-bucket
+  type: s3
+  source:
+    bucket: ((artifact_bucket))
+    versioned_file: gcp-spanner-tutorial-app.zip
+    access_key_id: ((aws_access_key_id))
+    secret_access_key: ((aws_secret_access_key))
+
 jobs:
 
 - name: build-gcp-spanner-example-package
@@ -26,3 +34,7 @@ jobs:
     - get: cg-customer-broker
   - task: build-gcp-spanner-example-package
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/build-gcp-spanner-example-package.yml
+  - put: tutorial-s3-bucket
+    params:
+      file: gcp-spanner-example/zip-files/gcp-spanner-tutorial-app.zip
+      acl: public-read
