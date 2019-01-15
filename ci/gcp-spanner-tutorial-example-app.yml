@@ -20,7 +20,7 @@ resources:
   type: s3
   source:
     bucket: ((artifact_bucket))
-    region: us-west-1
+    region_name: us-west-1
     versioned_file: gcp-spanner-tutorial-app.zip
     access_key_id: ((aws_access_key_id))
     secret_access_key: ((aws_secret_access_key))
