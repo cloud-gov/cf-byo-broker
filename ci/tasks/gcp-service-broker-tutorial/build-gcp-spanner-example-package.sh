@@ -12,4 +12,4 @@ set -e
 
 cd gcp-spanner-example
 
-./mvnw package
+./mvnw package -DskipTests
