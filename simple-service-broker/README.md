@@ -142,67 +142,35 @@ At this point, your broker should be registered with Cloud Foundry.  You can che
   simple-service-broker   https://simple-service-broker-humble-wallaby.cfapps.io
   ```
 
-## Using the Broker
+## Viewing the Marketplace
 
 At this point, your new service called `simple-service` should show up in the marketplace along side the other services.
 
 > NOTE: Because this is a space scoped broker, it will only show up in the marketplace in the space or spaces which it is registered. You can register the same broker in multiple spaces.
 
-### Viewing the Marketplace
+### Viewing the Marketplace in the CLI
 
 You can see this via the CLI or using the Stratos UI.
 
-* Run `cf m` using the CLI. You should see output similar to:
+* Run `cf marketplace` using the CLI. Within the marketplace, you should see your broker:
 
   ```
-  $ cf m
+  $ cf marketplace
   Getting services from marketplace in org 18f / space development as sgreenberg@rscale.io...
   OK
 
   service                         plans
 
-  ...other services...
-
-  simple-service                  simple-plan-1*, simple-plan-2*                                                                                    
-
-  ...other services...
+  simple-service                simple-service-plan-1, simple-service-plan-2
 
   ```
 
+> NOTE: You are seeing the same service and plans as you saw accessing the broker via `curl` above (if you completed that optional portion of the tutorial). This information is populated from the same `/v2/catalog` endpoint.  
 
+### Viewing the Marketplace in the Stratos UI
 
-* Open your Stratos console and navigate to the marketplace.  You should see the `simple-service` listed.
+You should also see your service listed in the Stratos UI.
 
-You should be seeing the same service and plans as you saw accessing the broker via a browswer above. This information is populated from the same `/v2/catalog` endpoint.  
+* Open your Stratos console and navigate to the marketplace. Be sure you have selected your org and space.  You should see the `simple-service` listed.
 
-### Provisioning
-
-The first step in using the broker is to provision an instance of the service.
-
-
-This is where the broker handles the complexity of the service.  Rather than you knowing how to install and configure each service, the broker encapsulates this for you.  All you need to know is how to invoke `create-service`.
-
-
-Provisioning the service asks the broker to create an instance of the service based on the selected service plan. Where a service could be the resiliency of the service. i.e. an HA version for production, or a minimal version for development.
-
-`cf create-service my-service-broker my-ha-service-plan my-service-instance`
-
-Behind the scenes, brokers will provision resources.  Exactly how is up the implementer of the broker.  
-
-
-
-#### Checking Your Work
-
-If the instance is created successfully, you should be able to see it by running `cf services`:
-
-
-
-### Binding
-
-Binding to the service asks the broker to provide the connection information to the application through the VCAP_SERVICE environment variable.
-
-`cf bind-service my-app my-service-broker`
-
-### Cleaning Up
-
-In a service broker environment there are two distinct areas. The instances which the service broker creates and the service broker itself.
+![Stratos Marketplace showing simple-service](img/stratos-marketplace.png "Stratos Marketplace")
