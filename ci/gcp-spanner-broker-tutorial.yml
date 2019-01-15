@@ -70,25 +70,33 @@ jobs:
   serial_groups: [keep-it-simple]
   plan:
   - get: cg-customer-broker
-#    passed: [deploy-gcp-service-broker]
-#    trigger: true
+    passed: [deploy-gcp-service-broker]
+    trigger: true
   - task: create-service-broker
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-service-broker.yml
     params:
       << : *cf-params
       << : *gcp-service-broker-app-name
       << : *gcp-service-broker-app-creds
+      << : *gcp-service-broker-name
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+      params:
+        << : *cf-params
+        << : *gcp-service-broker-app-name
+        <<: *gcp-service-broker-name
 
 # Cleanup all resources created by the pipeline.
-#- name: cleanup
-#  serial_groups: [keep-it-simple]
-#  plan:
-#  - get: cg-customer-broker
-#    passed: [create-service-broker]
-#    trigger: true
-#  - task: cleanup
-#    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
-#    params:
-#      << : *cf-params
-#      << : *gcp-service-broker-app-name
-    
+- name: cleanup
+  serial_groups: [keep-it-simple]
+  plan:
+  - get: cg-customer-broker
+    passed: [create-service-broker]
+    trigger: true
+  - task: cleanup
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+    params:
+      << : *cf-params
+      << : *gcp-service-broker-app-name
+      << : *gcp-service-broker-name
