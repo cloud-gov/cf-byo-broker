@@ -11,7 +11,7 @@ inputs:
 - name: cg-customer-broker
 
 run:
-  path: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.sh
+  path: cg-customer-broker/simple-service-broker/ci/tasks/delete-stratos.sh
 
 params:
   CF_API:
@@ -19,5 +19,4 @@ params:
   CF_PWD:
   CF_ORG:
   CF_SPACE:
-  BROKER_APPNAME:
-  SERVICE_INSTANCE_NAME:
+  STRATOS_APPNAME:
