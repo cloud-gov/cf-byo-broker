@@ -10,7 +10,7 @@ gcp-service-broker-app-creds: &gcp-service-broker-app-creds
 
 # Variable set in the broker manifest
 gcp-service-broker-manifest-params: &gcp-service-broker-manifest-params
-      << : *gcp-broker-app-name
+      << : *gcp-service-broker-app-name
       << : *gcp-service-broker-app-creds
       DB_HOST: ((db_host))
       DB_USERNAME: ((db_username))
@@ -63,7 +63,7 @@ jobs:
       file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
       params:
         << : *cf-params
-        << : *gcp-broker-app-name
+        << : *gcp-service-broker-app-name
 
 # Create a service broker using the app deployed above.
 - name: create-service-broker
