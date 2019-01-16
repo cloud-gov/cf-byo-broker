@@ -103,7 +103,6 @@ jobs:
   serial_groups: [serial]
   plan:
   - aggregate:
-    - get: broker-artifact
     - get: cg-customer-broker
       trigger: true
       passed: [deploy-broker]
