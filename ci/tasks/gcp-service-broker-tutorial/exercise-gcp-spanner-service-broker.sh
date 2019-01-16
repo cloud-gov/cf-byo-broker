@@ -15,5 +15,5 @@ set -e
 
 . cg-customer-broker/ci/tasks/common.sh
 
-cf cs $GCP_SPANNER_SERVICE $GCP_SPANNER_SERVICE_PLAN $TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE -c '{"name":"trades"}'
+cf cs $GCP_SPANNER_SERVICE $GCP_SPANNER_SERVICE_PLAN $TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE_NAME -c '{"name":"trades"}'
 

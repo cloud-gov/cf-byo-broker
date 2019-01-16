@@ -16,17 +16,21 @@ gcp-service-broker-manifest-params: &gcp-service-broker-manifest-params
       DB_USERNAME: ((db_username))
       DB_PASSWORD: ((db_password))
 
+# The name of the Service Broker created from the app
 gcp-service-broker-name: &gcp-service-broker-name
       GCP_SERVICE_BROKER_NAME: gcp-service-broker
 
+# The GCP Spanner service as listed in the CF marketplace
 gcp-spanner-service: &gcp-spanner-service
-      GCP_SPANNER_SERVICE: gcp-spanner-service
+      GCP_SPANNER_SERVICE: google-spanner
 
+# The GCP Spanner service plan
 gcp-spanner-service-plan: &gcp-spanner-service-plan
       GCP_SPANNER_SERVICE_PLAN: sandbox
-      
+
+# The name of the tutorial's GCP Spanner service instance
 tutorial-gcp-spanner-service-instance-name: &tutorial-gcp-spanner-service-instance-name
-      TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE: tutorial-gcp-spanner-service-instance
+      TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE_NAME: tutorial-gcp-spanner-service-instance
 
 # Cloud Foundry parameters
 cf-params: &cf-params
