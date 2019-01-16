@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 curl -O ${BROKER_ZIP_URL}
 
