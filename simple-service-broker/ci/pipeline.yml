@@ -159,12 +159,58 @@ jobs:
         << : *cf-params
         << : *names
 
+- name: create-bind-purge
+  serial_groups: [serial]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+      trigger: true
+      passed: [marketplace-via-cli]
+    - get: broker-source
+      trigger: true
+      passed: [marketplace-via-cli]
+  - task: create-service
+    file: cg-customer-broker/simple-service-broker/ci/tasks/create-service.yml
+    params:
+      << : *cf-params
+      << : *broker-service-info
+      << : *service-instance-name
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
+      params:
+        << : *cf-params
+        << : *names
+  - task: bind-service
+    file: cg-customer-broker/simple-service-broker/ci/tasks/bind-service.yml
+    params:
+      << : *cf-params
+      << : *broker-name
+      << : *service-instance-name
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
+      params:
+        << : *cf-params
+        << : *names
+  - task: purge-service-instance
+    file: cg-customer-broker/simple-service-broker/ci/tasks/purge-service-instance.yml
+    params:
+      << : *cf-params
+      << : *service-instance-name
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
+      params:
+        << : *cf-params
+        << : *names
+
 - name: cleanup
   serial_groups: [serial]
   plan:
   - get: cg-customer-broker
-    passed: [marketplace-via-cli]
-    # trigger: true
+    passed: [create-bind-purge]
+    trigger: true
   - task: cleanup
     file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
     params:
@@ -177,7 +223,7 @@ jobs:
   - aggregate:
     - get: cg-customer-broker
     - get: broker-source
-      passed: [marketplace-via-cli]
+      passed: [create-bind-purge]
       trigger: true
   - task: package-broker
     file: cg-customer-broker/simple-service-broker/ci/tasks/package-broker.yml

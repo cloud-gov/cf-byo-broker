@@ -1,16 +1,16 @@
-# Adding a Simple Broker to Cloud Foundry
+# Adding a Simple Service Broker to Cloud Foundry
 
-In this tutorial, we will show you how to deploy a simple service broker to a space in Cloud Foundry and make it available for use in the marketplace.
+In this tutorial, we will show you how to deploy a simple service broker to a space in Cloud Foundry and make it available for use via the marketplace.
 
 Before you begin, please be sure you are logged into a Cloud Foundry instance and targeted to an org and space.
 
-## What is a broker?
+## What is a Service Broker?
 
 A service broker is an application that implements a standard API, the [Open Service Broker API](https://www.openservicebrokerapi.org/). Service brokers hide the complexity of provisioning and configuring the underlying service behind a standard API. In Cloud Foundry terms, this means you can do things like create a database using a standard command `cf create-service`, rather than needing to know how to install and configure the database.
 
 Service brokers are behind all of the services listed in the marketplace. In this tutorial, we will show you how add your own service broker to the marketplace. The services you see in the marketplace now are likely installed and configured by the administrators of your Cloud Foundry. However, if you are SpaceDeveloper, you can bring your own space scoped broker. This tutorial will show you how to do this.
 
-## Deploying a Broker as an App
+## Deploying a Service Broker as an App
 
 A service broker is an application that implements a RESTful API, the [Open Service Broker API](https://www.openservicebrokerapi.org/). Brokers can be deployed anywhere as long as the Cloud Foundry instance (specifically the Cloud Controller) can reach it via HTTPS. Because our broker is a stateless app and Cloud Foundry is the best platform for stateless apps, we will deploy our broker as an app to Cloud Foundry.
 
@@ -144,7 +144,7 @@ At this point, your broker should be registered with Cloud Foundry.  You can che
 
 At this point, your new service called `simple-service` should show up in the marketplace along side the other services.
 
-> NOTE: Because this is a space scoped broker, it will only show up in the marketplace in the space or spaces which it is registered. You can register the same broker in multiple spaces.
+> NOTE: Because this is a space scoped broker, it will only show up in the marketplace in the space or spaces which it is registered. 
 
 ### Viewing the Marketplace in the CLI
 
@@ -174,7 +174,7 @@ You should also see your service listed in the Stratos UI.
 ![Stratos Marketplace showing simple-service](img/stratos-marketplace.png "Stratos Marketplace")
 
 
-## Helpful Hints Beyond the Simple Service Broker
+## Beyond the Simple Service Broker
 
 At this point, you should be able to create and bind service instances as with any other service in the marketplace. Of course our simple broker isn't really brokering anything as there is no backing service. Therefore our instances aren't terribly useful. But we can use them to practice a few things.
 
