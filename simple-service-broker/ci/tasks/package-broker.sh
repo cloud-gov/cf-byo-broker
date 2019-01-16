@@ -1,6 +1,8 @@
 #!/bin/bash
 
-mv broker-source simple-service-broker
+mkdir simple-service-broker
+
+cp -R broker-source/* simple-service-broker/*
 
 zip -r simple-service-broker simple-service-broker
 
