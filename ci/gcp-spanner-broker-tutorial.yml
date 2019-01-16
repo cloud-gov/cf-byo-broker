@@ -114,8 +114,8 @@ jobs:
       params:
         << : *cleanup-params
 
-# Exercise service broker with the example application
-- name: exercise-gcp-spanner-service-broker
+# Create the GCP spanner service instance which the app will use
+- name: create-gcp-spanner-service-instance
   serial_groups: [keep-it-simple]
   plan:
   - aggregate:
@@ -123,8 +123,8 @@ jobs:
 #      passed: [create-service-broker]
 #      trigger: true
     - get: tutorial-s3-bucket
-  - task: exercise-gcp-spanner-service-broker
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-gcp-spanner-service-broker.yml
+  - task: create-gcp-spanner-service-instance
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-gcp-spanner-service-instance.yml
     params:
       <<: *cf-params
       <<: *gcp-spanner-service
@@ -141,7 +141,7 @@ jobs:
   serial_groups: [keep-it-simple]
   plan:
   - get: cg-customer-broker
-    passed: [exercise-gcp-spanner-service-broker]
+    passed: [create-gcp-spanner-service-instance]
     trigger: true
   - task: cleanup
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
