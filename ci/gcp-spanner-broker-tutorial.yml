@@ -92,7 +92,7 @@ jobs:
       task: cleanup
       file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
       params:
-        << : *cf-params
+        << : *cleanup-params
 
 # Create a service broker using the app deployed above.
 - name: create-service-broker
@@ -112,9 +112,7 @@ jobs:
       task: cleanup
       file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
       params:
-        << : *cf-params
-        << : *gcp-service-broker-app-name
-        << : *gcp-service-broker-name
+        << : *cleanup-params
 
 # Exercise service broker with the example application
 - name: exercise-gcp-spanner-service-broker
@@ -132,14 +130,11 @@ jobs:
       <<: *gcp-spanner-service
       <<: *gcp-spanner-service-plan
       <<: *tutorial-gcp-spanner-service-instance-name
-#    on_failure: &cleanup-task
-#      task: cleanup
-#      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
-#      params:
-#        << : *cf-params
-#        << : *gcp-service-broker-app-name
-#        << : *gcp-service-broker-name
-#        << : *gcp-spanner-service
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+      params:
+        << : *cleanup-params
 
 # Cleanup all resources created by the pipeline.
 - name: cleanup
