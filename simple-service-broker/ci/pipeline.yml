@@ -174,7 +174,6 @@ jobs:
   - aggregate:
     - get: cg-customer-broker
       passed: [marketplace-via-cli]
-      trigger: true
     - get: broker-source
       passed: [marketplace-via-cli]
       trigger: true
