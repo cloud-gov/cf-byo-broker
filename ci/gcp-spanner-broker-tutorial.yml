@@ -10,8 +10,8 @@ gcp-service-broker-app-creds: &gcp-service-broker-app-creds
 
 # Variable set in the broker manifest
 gcp-service-broker-manifest-params: &gcp-service-broker-manifest-params
-      << : *gcp-service-broker-app-name
-      << : *gcp-service-broker-app-creds
+      <<: *gcp-service-broker-app-name
+      <<: *gcp-service-broker-app-creds
       DB_HOST: ((db_host))
       DB_USERNAME: ((db_username))
       DB_PASSWORD: ((db_password))
@@ -39,6 +39,14 @@ cf-params: &cf-params
       CF_PWD: ((cf_password))
       CF_ORG: ((cf_org))
       CF_SPACE: ((cf_space))
+
+# Cleanup parameters
+clean-params: &cleanup-params
+      <<: *cf-params
+      <<: *gcp-service-broker-app-name
+      <<: *gcp-service-broker-name
+      <<: *tutorial-gcp-spanner-service-instance-name
+
 
 resources:
 
@@ -134,15 +142,13 @@ jobs:
 #        << : *gcp-spanner-service
 
 # Cleanup all resources created by the pipeline.
-#- name: cleanup
-#  serial_groups: [keep-it-simple]
-#  plan:
-#  - get: cg-customer-broker
-#    passed: [create-service-broker]
-#    trigger: true
-#  - task: cleanup
-#    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
-#    params:
-#      << : *cf-params
-#      << : *gcp-service-broker-app-name
-#      << : *gcp-service-broker-name
+- name: cleanup
+  serial_groups: [keep-it-simple]
+  plan:
+  - get: cg-customer-broker
+    passed: [exercise-gcp-spanner-service-broker]
+    trigger: true
+  - task: cleanup
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+    params:
+      << : *cleanup-params
