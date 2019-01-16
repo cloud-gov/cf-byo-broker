@@ -19,8 +19,14 @@ gcp-service-broker-manifest-params: &gcp-service-broker-manifest-params
 gcp-service-broker-name: &gcp-service-broker-name
       GCP_SERVICE_BROKER_NAME: gcp-service-broker
 
-gcp-spanner-service-name: &gcp-spanner-service-name
-      GCP_SPANNER_SERVICE_NAME: gcp-spanner-service
+gcp-spanner-service: &gcp-spanner-service
+      GCP_SPANNER_SERVICE: gcp-spanner-service
+
+gcp-spanner-service-plan: &gcp-spanner-service-plan
+      GCP_SPANNER_SERVICE_PLAN: sandbox
+      
+tutorial-gcp-spanner-service-instance-name: &tutorial-gcp-spanner-service-instance-name
+      TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE: tutorial-gcp-spanner-service-instance
 
 # Cloud Foundry parameters
 cf-params: &cf-params
@@ -111,8 +117,9 @@ jobs:
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-gcp-spanner-service-broker.yml
     params:
       <<: *cf-params
-      <<: *gcp-service-broker-name
-      <<: *gcp-spanner-service-name
+      <<: *gcp-spanner-service
+      <<: *gcp-spanner-service-plan
+      <<: *tutorial-gcp-spanner-service-instance-name
 #    on_failure: &cleanup-task
 #      task: cleanup
 #      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
@@ -120,7 +127,7 @@ jobs:
 #        << : *cf-params
 #        << : *gcp-service-broker-app-name
 #        << : *gcp-service-broker-name
-#        << : *gcp-spanner-service-name
+#        << : *gcp-spanner-service
 
 # Cleanup all resources created by the pipeline.
 #- name: cleanup
