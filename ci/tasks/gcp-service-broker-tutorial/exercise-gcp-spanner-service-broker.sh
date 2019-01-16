@@ -15,5 +15,5 @@ set -e
 
 . cg-customer-broker/ci/tasks/common.sh
 
-cf cs $GCP_SERVICE_BROKER_NAME sandbox $GCP_SPANNER_SERVICE_NAME -c `{"name":"trades"}`
+cf cs $GCP_SERVICE_BROKER_NAME sandbox $GCP_SPANNER_SERVICE_NAME -c '{"name":"trades"}'
 

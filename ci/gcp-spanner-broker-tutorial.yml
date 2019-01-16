@@ -104,7 +104,8 @@ jobs:
   plan:
   - aggregate:
     - get: cg-customer-broker
-      passed: [create-service-broker]
+#      passed: [create-service-broker]
+#      trigger: true
     - get: tutorial-s3-bucket
   - task: exercise-gcp-spanner-service-broker
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-gcp-spanner-service-broker.yml
