@@ -16,7 +16,8 @@ The services you see in the marketplace are likely system-wide; brokers are inst
 
 A service broker is an application that implements a RESTful API, the [Open Service Broker API](https://www.openservicebrokerapi.org/). Brokers can be deployed anywhere as long as the Cloud Foundry instance (specifically the Cloud Controller) can reach it via HTTPS. Because our broker is a stateless app and Cloud Foundry is the best platform for stateless apps, we will deploy our broker as an app to Cloud Foundry.
 
-* Download the simple-service-broker.zip and unzip it (TODO: Add zip and link). Inside is a very simple service broker written in Go along with a Cloud Foundry manifest.
+* Download the [simple-service-broker.zip](http://18f.artifacts.rscale.io.s3-website-us-west-2.amazonaws.com/simple-service-broker.zip) and unzip it. Change to the unzipped `simple-service-broker` directory. Inside is a very simple service broker written in Go along with a Cloud Foundry manifest.
+
 * Change to the unzipped directory and use the supplied manifest to deploy the application. We can add the `--random-route` flag to push command to try to prevent route collisions.
 
   ```
@@ -41,8 +42,7 @@ A service broker is an application that implements a RESTful API, the [Open Serv
   #0   running   2019-01-14T19:51:09Z   0.0%   11.2M of 128M   9.3M of 256M   
   ```
 
-
-* Make note of the route created as you will need this in the next step.
+* Make note of the route created as you will need this in the next step. In the above example it is `simple-service-broker-humble-wallaby.cfapps.io`. Your route will differ.
 
 > Note: We are using `random-route` to help prevent route collisions.  You should not use this feature except in development, training or CI/CD scenarios such as this. We do not recommend using `random-route` in production.
 

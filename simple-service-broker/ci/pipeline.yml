@@ -32,6 +32,9 @@ broker-service-info: &broker-service-info
       BROKER_SERVICE_NAME: simple-service
       BROKER_PLAN_NAME: simple-service-plan-1
 
+broker-zip-url: &broker-zip-url
+      BROKER_ZIP_URL: "http://18f.artifacts.rscale.io.s3-website-us-west-2.amazonaws.com/simple-service-broker.zip"
+
 resources:
 
 - name: cg-customer-broker
@@ -78,7 +81,8 @@ jobs:
       trigger: true
   - task: deploy
     file: cg-customer-broker/simple-service-broker/ci/tasks/deploy.yml
-    params: *cf-params
+    params:
+      << : *cf-params
     on_failure: &cleanup-task
       task: cleanup
       file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
@@ -183,6 +187,20 @@ jobs:
       acl: public-read
       file: output/simple-service-broker.zip
 
+- name: verify-candidate-zip
+  serial_groups: [serial]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+      passed: [package-broker]
+    - get: broker-source
+      passed: [package-broker]
+      trigger: true
+  - task: verify-zip
+    file: cg-customer-broker/simple-service-broker/ci/tasks/package-broker.yml
+    params:
+      BROKER_ZIP_URL: *broker-zip-url
+
 - name: deploy-stratos
   plan:
   - aggregate:
@@ -199,7 +217,7 @@ jobs:
   plan:
   - aggregate:
     - get: cg-customer-broker
-    - get: stratos
+      passed: [deploy-stratos]
   - task: delete-stratos
     file: cg-customer-broker/simple-service-brokerci/tasks/delete-stratos.yml
     params:
