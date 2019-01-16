@@ -1,6 +1,8 @@
 #!/bin/bash
 
-wget ${BROKER_ZIP_URL}
+set -e
+
+curl -O ${BROKER_ZIP_URL}
 
 unzip simple-service-broker.zip
 
