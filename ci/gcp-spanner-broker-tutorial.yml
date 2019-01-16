@@ -104,24 +104,22 @@ jobs:
   plan:
   - aggregate:
     - get: cg-customer-broker
-      passed: create-service-broker
-      trigger: true
+      passed: [create-service-broker]
     - get: tutorial-s3-bucket
   - task: exercise-gcp-spanner-service-broker
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-gcp-spanner-service-broker.yml
     params:
       <<: *cf-params
-      <<: *gcp-service-broker-app-name
       <<: *gcp-service-broker-name
       <<: *gcp-spanner-service-name
-    on_failure: &cleanup-task
-      task: cleanup
-      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
-      params:
-        << : *cf-params
-        << : *gcp-service-broker-app-name
-        << : *gcp-service-broker-name
-        << : *gcp-spanner-service-name
+#    on_failure: &cleanup-task
+#      task: cleanup
+#      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+#      params:
+#        << : *cf-params
+#        << : *gcp-service-broker-app-name
+#        << : *gcp-service-broker-name
+#        << : *gcp-spanner-service-name
 
 # Cleanup all resources created by the pipeline.
 #- name: cleanup
