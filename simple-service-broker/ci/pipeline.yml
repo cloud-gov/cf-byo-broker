@@ -33,7 +33,7 @@ broker-service-info: &broker-service-info
       BROKER_PLAN_NAME: simple-service-plan-1
 
 broker-zip-url: &broker-zip-url
-      BROKER_ZIP_URL: "http://18f.artifacts.rscale.io.s3-website-us-west-2.amazonaws.com/simple-service-broker.zip"
+      BROKER_ZIP_URL: "http://18f.artifacts.rscale.io.s3-website-us-west-2.amazonaws.com:80/simple-service-broker.zip"
 
 resources:
 
@@ -176,7 +176,6 @@ jobs:
   plan:
   - aggregate:
     - get: cg-customer-broker
-      passed: [marketplace-via-cli]
     - get: broker-source
       passed: [marketplace-via-cli]
       trigger: true
@@ -192,14 +191,15 @@ jobs:
   plan:
   - aggregate:
     - get: cg-customer-broker
-      passed: [package-broker]
     - get: broker-source
       passed: [package-broker]
       trigger: true
+    - get: broker-artifact
+      trigger: true
   - task: verify-zip
-    file: cg-customer-broker/simple-service-broker/ci/tasks/package-broker.yml
+    file: cg-customer-broker/simple-service-broker/ci/tasks/verify-zip.yml
     params:
-      BROKER_ZIP_URL: *broker-zip-url
+      << : *broker-zip-url
 
 - name: deploy-stratos
   plan:
