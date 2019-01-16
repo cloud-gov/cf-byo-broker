@@ -57,6 +57,15 @@ resources:
     branch: v2-master
     depth: 1
 
+- name: broker-artifact
+  type: s3
+  source:
+    bucket: ((artifact_bucket))
+    region_name: us-west-2
+    versioned_file: simple-service-broker.zip
+    access_key_id: ((aws_access_key_id))
+    secret_access_key: ((aws_secret_access_key))
+
 jobs:
 
 - name: deploy-broker
@@ -94,6 +103,7 @@ jobs:
   serial_groups: [serial]
   plan:
   - aggregate:
+    - get: broker-artifact
     - get: cg-customer-broker
       trigger: true
       passed: [deploy-broker]
@@ -146,23 +156,6 @@ jobs:
         << : *cf-params
         << : *names
 
-
-
-
-  # - task: create-service
-  #   file: cg-customer-broker/simple-service-broker/ci/tasks/create-service.yml
-  #   params:
-  #     << : *broker-name
-  #     << : *service-instance-name
-  #     << : *cf-params
-  #   on_failure: &cleanup-task
-  #     task: cleanup
-  #     file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-  #     params:
-  #       << : *cf-params
-  #       << : *names
-
-
 - name: cleanup
   serial_groups: [serial]
   plan:
@@ -174,6 +167,23 @@ jobs:
     params:
       << : *cf-params
       << : *names
+
+- name: package-broker
+  serial_groups: [serial]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+      passed: [marketplace-via-cli]
+      trigger: true
+    - get: broker-source
+      passed: [marketplace-via-cli]
+      trigger: true
+  - task: package-broker
+    file: cg-customer-broker/simple-service-broker/ci/tasks/package-broker.yml
+  - put: broker-artifact
+    params:
+      acl: public-read
+      file: output/simple-service-broker.zip
 
 - name: deploy-stratos
   plan:
@@ -187,7 +197,7 @@ jobs:
       << : *stratos-name
       << : *stratos-hostname
 
-- name: delete
+- name: delete-stratos
   plan:
   - aggregate:
     - get: cg-customer-broker
