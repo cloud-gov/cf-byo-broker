@@ -13,5 +13,3 @@ this_directory=`dirname "$0"`
 fly -t ${target} set-pipeline -p simple-service-broker-tutorial -c ${this_directory}/../simple-service-broker/ci/pipeline.yml
 
 fly -t ${target} set-pipeline -p gcp-spanner-broker-tutorial -c ${this_directory}/gcp-spanner-broker-tutorial.yml
-
-fly -t ${target} set-pipeline -p gcp-spanner-tutorial-example-app -c ${this_directory}/gcp-spanner-tutorial-example-app.yml

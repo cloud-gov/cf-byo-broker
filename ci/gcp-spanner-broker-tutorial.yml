@@ -67,15 +67,6 @@ resources:
     branch: master
     depth: 1
 
-- name: tutorial-s3-bucket
-  type: s3
-  source:
-    bucket: ((artifact_bucket))
-    region_name: ((artifact_bucket_region))
-    versioned_file: gcp-spanner-tutorial-app.zip
-    access_key_id: ((aws_access_key_id))
-    secret_access_key: ((aws_secret_access_key))
-
 
 - name: gcp-spanner-example-release
   type: github-release
@@ -111,7 +102,7 @@ jobs:
   plan:
   - get: cg-customer-broker
     passed: [deploy-gcp-service-broker]
-#    trigger: true
+    trigger: true
   - task: create-service-broker
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-service-broker.yml
     params:
@@ -148,7 +139,7 @@ jobs:
 
 # Exercise the GCP Spanner service instance
 - name: exercise-gcp-spanner-service-instance
-  serial_groups [keep-it-simple]
+  serial_groups: [keep-it-simple]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -169,13 +160,13 @@ jobs:
 #        << : *cleanup-params
 
 # Cleanup all resources created by the pipeline.
-- name: cleanup
-  serial_groups: [keep-it-simple]
-  plan:
-  - get: cg-customer-broker
-    passed: [create-gcp-spanner-service-instance]
-    trigger: true
-  - task: cleanup
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
-    params:
-      << : *cleanup-params
+#- name: cleanup
+#  serial_groups: [keep-it-simple]
+#  plan:
+#  - get: cg-customer-broker
+#    passed: [create-gcp-spanner-service-instance]
+#    trigger: true
+#  - task: cleanup
+#    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+#    params:
+#      << : *cleanup-params
