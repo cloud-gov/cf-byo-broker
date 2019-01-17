@@ -28,6 +28,9 @@ gcp-spanner-service: &gcp-spanner-service
 gcp-spanner-service-plan: &gcp-spanner-service-plan
       GCP_SPANNER_SERVICE_PLAN: sandbox
 
+gcp-spanner-example-app-name: &gcp-spanner-example-app-name
+      GCP_SPANNER_EXAMPLE_APP_NAME: gcp-spanner-example
+
 # The name of the tutorial's GCP Spanner service instance
 tutorial-gcp-spanner-service-instance-name: &tutorial-gcp-spanner-service-instance-name
       TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE_NAME: tutorial-gcp-spanner-service-instance
@@ -73,6 +76,14 @@ resources:
     access_key_id: ((aws_access_key_id))
     secret_access_key: ((aws_secret_access_key))
 
+
+- name: gcp-spanner-example-release
+  type: github-release
+  source:
+    owner: primetimesoftware
+    repository: gcp-spanner-example
+    access_token: ((github_password))
+
 jobs:
 
 # Deploy the service broker as an application
@@ -100,7 +111,7 @@ jobs:
   plan:
   - get: cg-customer-broker
     passed: [deploy-gcp-service-broker]
-    trigger: true
+#    trigger: true
   - task: create-service-broker
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-service-broker.yml
     params:
@@ -143,8 +154,19 @@ jobs:
     - get: cg-customer-broker
     #      passed: [create-gcp-spanner-service-instance]
     #      trigger: true
-    - get: tutorial-s3-bucket
+    - get: gcp-spanner-example-release
+      version: { tag: 'latest' }
   - task: exercise-gcp-spanner-service-instance
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-gcp-spanner-service-instance.yml
+    params:
+      <<: *cf-params
+      <<: *gcp-spanner-service
+      <<: *gcp-spanner-example-app-name
+#    on_failure: &cleanup-task
+#      task: cleanup
+#      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+#      params:
+#        << : *cleanup-params
 
 # Cleanup all resources created by the pipeline.
 - name: cleanup
