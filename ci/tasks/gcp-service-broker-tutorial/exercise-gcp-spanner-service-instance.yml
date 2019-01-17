@@ -11,8 +11,7 @@ inputs:
   - gcp-spanner-example-release
 
 run:
-  path:
-    cg-customer-broker/ci/tasks/exercise-gcp-spanner-service-instance.sh
+  path: cg-customer-broker/ci/tasks/exercise-gcp-spanner-service-instance.sh
 
 params:
   CF_API:
