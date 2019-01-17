@@ -8,6 +8,7 @@ image_resource:
     tag: 'latest'
 
 inputs:
+- name: cg-customer-broker
 - name: gcp-spanner-example-release
 
 run:
