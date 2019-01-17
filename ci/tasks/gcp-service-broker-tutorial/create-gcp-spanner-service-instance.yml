@@ -9,7 +9,6 @@ image_resource:
 
 inputs:
 - name: cg-customer-broker
-- name: tutorial-s3-bucket
 
 run:
   path: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-gcp-spanner-service-instance.sh
