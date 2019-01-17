@@ -151,7 +151,7 @@ jobs:
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-gcp-spanner-service-instance.yml
     params:
       <<: *cf-params
-      <<: *gcp-spanner-service
+      <<: *tutorial-gcp-spanner-service-instance-name
       <<: *gcp-spanner-example-app-name
 #    on_failure: &cleanup-task
 #      task: cleanup
