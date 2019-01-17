@@ -5,6 +5,8 @@ set -e
 
 . cg-customer-broker/ci/tasks/common.sh
 
+cf stop ${BROKER_APPNAME}
+
 cf purge-service-instance -f ${SERVICE_INSTANCE_NAME}
 
 instance=`cf services | grep ${SERVICE_INSTANCE_NAME}`
