@@ -197,6 +197,7 @@ jobs:
     file: cg-customer-broker/simple-service-broker/ci/tasks/purge-service-instance.yml
     params:
       << : *cf-params
+      << : *broker-name
       << : *service-instance-name
     on_failure: &cleanup-task
       task: cleanup
