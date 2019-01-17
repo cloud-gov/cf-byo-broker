@@ -11,7 +11,7 @@ unzip *.zip
 
 cf p $GCP_SPANNER_EXAMPLE_APP_NAME -p *.jar --no-start
 
-cf bs $GCP_SPANNER_EXAMPLE_APP_NAME $GCP_SPANNER_SERVICE -c '{"role":"spanner.databaseAdmin"}'
+cf bs $GCP_SPANNER_EXAMPLE_APP_NAME $TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE_NAME: -c '{"role":"spanner.databaseAdmin"}'
 
 cf start $GCP_SPANNER_EXAMPLE_APP_NAME
 
