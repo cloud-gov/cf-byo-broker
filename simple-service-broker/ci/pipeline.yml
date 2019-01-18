@@ -19,6 +19,9 @@ cf-params: &cf-params
       CF_ORG: ((cf_org))
       CF_SPACE: ((cf_space))
 
+cf-another-space: &cf-another-space
+      CF_ANOTHER_SPACE: ((cf_another_space))
+
 names: &names
       << : *broker-name
       << : *stratos-name
@@ -95,6 +98,7 @@ jobs:
       params:
         << : *cf-params
         << : *names
+        << : *cf-another-space
   - task: curl-catalog
     file: cg-customer-broker/simple-service-broker/ci/tasks/curl-catalog.yml
     params:
@@ -102,12 +106,7 @@ jobs:
       << : *broker-service-info
       << : *cf-params
       << : *broker-credentials
-    on_failure: &cleanup-task
-      task: cleanup
-      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-      params:
-        << : *cf-params
-        << : *names
+    on_failure: *cleanup-task
 
 - name: create-service-broker
   serial_groups: [serial]
@@ -125,23 +124,13 @@ jobs:
       << : *cf-params
       << : *broker-name
       << : *broker-credentials
-    on_failure: &cleanup-task
-      task: cleanup
-      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-      params:
-        << : *cf-params
-        << : *names
+    on_failure: *cleanup-task
   - task: service-brokers
     file: cg-customer-broker/simple-service-broker/ci/tasks/service-brokers.yml
     params:
       << : *broker-name
       << : *cf-params
-    on_failure: &cleanup-task
-      task: cleanup
-      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-      params:
-        << : *cf-params
-        << : *names
+    on_failure: *cleanup-task
 
 - name: marketplace-via-cli
   serial_groups: [serial]
@@ -158,12 +147,39 @@ jobs:
     params:
       << : *cf-params
       << : *broker-service-info
-    on_failure: &cleanup-task
-      task: cleanup
-      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-      params:
-        << : *cf-params
-        << : *names
+    on_failure: *cleanup-task
+
+- name: another-space
+  serial_groups: [serial]
+  plan:
+  - aggregate:
+    - get: cg-customer-broker
+      trigger: true
+      passed: [marketplace-via-cli]
+    - get: broker-source
+      trigger: true
+      passed: [marketplace-via-cli]
+  - task: create-service-broker
+    file: cg-customer-broker/simple-service-broker/ci/tasks/create-service-broker.yml
+    params:
+      CF_API: ((cf_api))
+      CF_USER: ((cf_user))
+      CF_PWD: ((cf_password))
+      CF_ORG: ((cf_org))
+      CF_SPACE: ((cf_another_space))
+      << : *broker-name
+      << : *broker-credentials
+    on_failure: *cleanup-task
+  - task: service-brokers
+    file: cg-customer-broker/simple-service-broker/ci/tasks/service-brokers.yml
+    params:
+      CF_API: ((cf_api))
+      CF_USER: ((cf_user))
+      CF_PWD: ((cf_password))
+      CF_ORG: ((cf_org))
+      CF_SPACE: ((cf_another_space))
+      << : *broker-name
+    on_failure: *cleanup-task
 
 - name: create-bind-purge
   serial_groups: [serial]
@@ -181,48 +197,29 @@ jobs:
       << : *cf-params
       << : *broker-service-info
       << : *service-instance-name
-    on_failure: &cleanup-task
-      task: cleanup
-      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-      params:
-        << : *cf-params
-        << : *names
+    on_failure: *cleanup-task
   - task: bind-service
     file: cg-customer-broker/simple-service-broker/ci/tasks/bind-service.yml
     params:
       << : *cf-params
       << : *broker-name
       << : *service-instance-name
-    on_failure: &cleanup-task
-      task: cleanup
-      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-      params:
-        << : *cf-params
-        << : *names
+    on_failure: *cleanup-task
   - task: purge-service-instance
     file: cg-customer-broker/simple-service-broker/ci/tasks/purge-service-instance.yml
     params:
       << : *cf-params
       << : *broker-name
       << : *service-instance-name
-    on_failure: &cleanup-task
-      task: cleanup
-      file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-      params:
-        << : *cf-params
-        << : *names
+    on_failure: *cleanup-task
 
 - name: cleanup
   serial_groups: [serial]
   plan:
   - get: cg-customer-broker
-    passed: [create-bind-purge]
+    passed: [create-bind-purge, another-space]
     trigger: true
-  - task: cleanup
-    file: cg-customer-broker/simple-service-broker/ci/tasks/cleanup.yml
-    params:
-      << : *cf-params
-      << : *names
+  - *cleanup-task
 
 - name: package-broker
   serial_groups: [serial]

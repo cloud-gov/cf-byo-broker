@@ -99,7 +99,7 @@ Let's break down the request:
   * The `-s` flag asks `curl` to prompt you for a password. `curl` does allow you to specify the password as part of the command. However if you used that flag, the password would end up in your terminal history. It is best to get in the habit of not putting passwords into commands.
 * The `-H` flag allows you to specify a header and value.  The `X-Broker-API-Version` header must also be sent with the request. The value of this header is the version of the Open Service Broker API this broker supports. This is so the platform (like our Cloud Foundry instance) can verify it supports the version of the broker (in our case version `2.14`).
 
-You will see this broker exposes a single service called `simple-service` which offers two plans (or tiers) `simple-plan-1` and `simple-plan-2`. More on this later.
+You will see this broker exposes a single service called `simple-service` which offers two plans (or tiers) `simple-service-plan-1` and `simple-service-plan-2`. More on this later.
 
 > NOTE: `jq` (https://stedolan.github.io/jq/) is a very helpful utility that can parse and format JSON output. To view the output of our curl request in a more human friendly format, you can pipe the output of the `curl` into `jq`: `curl -s -u admin -H "X-Broker-API-Version: 2.14" https://<YOUR-BROKER-ROUTE>/v2/catalog | jq`
 
@@ -109,11 +109,11 @@ Once the broker application is running, we can register it as a service broker w
 
 > More information on roles in Cloud Foundry is availble here: https://docs.cloudfoundry.org/concepts/roles.html.
 
-### A Note Space-Scoped Broker Names
+### Space-Scoped Broker Names
 
 Service brokers are assigned names in Cloud Foundry. Just like with applications and service instances, these names are only used internally within Cloud Foundry to reference the respective entity. They have no meaning outside of Cloud Foundry. Applications and service instance names are scoped to a space. To illustrate this scope, two different applications could be deployed to two different spaces and both have the same name (such as `my-app`).
 
-Currently, Cloud Foundry has a limitation whereby the name of a space-scoped service broker must be unique. This is a known limitation that is being addressed by the development teams. To get around this limitation, we recommend adding the org and space as part of the name assigned to your broker. You will see these denoted as `<YOUR_ORG>` and `<YOUR_SPACE>` below.
+Currently, Cloud Foundry has a limitation whereby the name of a space-scoped service broker must be unique. **This is a known limitation that is being addressed by the development teams.** To get around this limitation, we recommend adding the org and space as part of the name assigned to your broker. You will see these denoted as `<YOUR_ORG>` and `<YOUR_SPACE>` below.
 
 * Use the `create-service-broker` command to register your broker with Cloud Foundry.
 
@@ -143,7 +143,7 @@ At this point, your broker should be registered with Cloud Foundry.  You can che
   Getting service brokers as sgreenberg@rscale.io...
 
   name            url
-  simple-service-broker   https://simple-service-broker-humble-wallaby.cfapps.io
+  simple-service-broker-18f-integration   https://simple-service-broker-humble-wallaby.cfapps.io
   ```
 
 ## Viewing the Marketplace
@@ -160,7 +160,7 @@ You can see this via the CLI or using the Stratos UI.
 
   ```
   $ cf marketplace
-  Getting services from marketplace in org 18f / space development as sgreenberg@rscale.io...
+  Getting services from marketplace in org 18f / space integration as sgreenberg@rscale.io...
   OK
 
   service                         plans
@@ -184,9 +184,46 @@ You should also see your service listed in the Stratos UI.
 
 At this point, you should be able to create and bind service instances as with any other service in the marketplace. Of course our simple broker isn't really brokering anything as there is no backing service. Therefore our instances aren't terribly useful. But we can use them to practice a few things.
 
+### Using the Same Broker in Another Space
+
+You can use the same broker in another space without redeploying it. You can simple register the same broker in another space using `cf create-service-broker`.
+
+Because of the limitation on broker names documented [above](#space-scoped-broker-names), you will need to provide a unique name to the `cf create-service-broker` command. However, if you follow the recommended workaround of adding the org and space, it should all work for you.
+
+> NOTE: This is optional. If you only have access to one space, you won't be able to do this.
+
+* Target another space
+
+  ```
+  $ cf target -s <ANOTHER_SPACE>
+  ```
+
+* Register the same service broker using a different name (but the same username, password and URL)
+
+  ```
+  $ cf create-service-broker simple-service-broker-<YOUR_ORG>-<YOUR_SPACE> admin secret https://<YOUR-BROKER-ROUTE> --space-scoped
+  ```
+
+You should now have access to the broker in this space.
+
+* Run `cf marketplace` using the CLI. Within the marketplace, you should see your broker:
+
+  ```
+  $ cf marketplace
+  Getting services from marketplace in org 18f / space <ANOTHER_SPACE> as sgreenberg@rscale.io...
+  OK
+
+  service                         plans
+
+  simple-service                simple-service-plan-1, simple-service-plan-2
+
+  ```
+
+### Purging Service Instances
+
 While our broker is quite simple, other brokers will bring their own complexity. This is often because each broker will often require specific configuration to connect with the backing services. We can use the simple broker to learn some helpful hints on dealing with more complex brokers.
 
-### Creating and Binding an Instance
+#### Creating and Binding an Instance
 
 First, let's create a service instance.  
 
@@ -246,7 +283,7 @@ Now, let's bind it. We aren't looking to use the service, so it doesn't matter w
   }
   ```
 
-### Purging Service Instances and Bindings
+#### Purging Service Instances and Bindings
 
 If you find yourself iterating on broker deployments, it may be helpful at times to purge service instances or bindings. Imagine if your broker became unavailable or returned errors after you had already created service instances or service bindings. The Cloud Foundry database would still have a record of the instances and the bindings. Your attempts to delete them using `cf delete-service` or `cf unbind-service` will fail as the broker won't be available. This is what `cf purge-service-instance` is for.
 

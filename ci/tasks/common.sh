@@ -18,7 +18,3 @@ get_route() {
   route=`cf curl /v2/apps/${guid}/env | jq -r '.application_env_json.VCAP_APPLICATION.application_uris[0]'`
   echo ${route}
 }
-
-get_service_broker_name() {
-  echo "${BROKER_APPNAME}-${CF_ORG}-${CF_SPACE}"
-}
