@@ -81,7 +81,7 @@ resources:
 jobs:
 
 - name: deploy-broker
-  serial_groups: [serial]
+  serial_groups: [space1]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -109,7 +109,7 @@ jobs:
     on_failure: *cleanup-task
 
 - name: create-service-broker
-  serial_groups: [serial]
+  serial_groups: [space1]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -133,7 +133,7 @@ jobs:
     on_failure: *cleanup-task
 
 - name: marketplace-via-cli
-  serial_groups: [serial]
+  serial_groups: [space1]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -150,7 +150,7 @@ jobs:
     on_failure: *cleanup-task
 
 - name: another-space
-  serial_groups: [serial]
+  serial_groups: [space2]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -162,11 +162,8 @@ jobs:
   - task: create-service-broker
     file: cg-customer-broker/simple-service-broker/ci/tasks/create-service-broker.yml
     params:
-      CF_API: ((cf_api))
-      CF_USER: ((cf_user))
-      CF_PWD: ((cf_password))
-      CF_ORG: ((cf_org))
-      CF_SPACE: ((cf_another_space))
+      CF_ANOTHER_SPACE: ((cf_another_space))
+      << : *cf-params
       << : *broker-name
       << : *broker-credentials
     on_failure: *cleanup-task
@@ -182,7 +179,7 @@ jobs:
     on_failure: *cleanup-task
 
 - name: create-bind-purge
-  serial_groups: [serial]
+  serial_groups: [space1]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -214,7 +211,7 @@ jobs:
     on_failure: *cleanup-task
 
 - name: cleanup
-  serial_groups: [serial]
+  serial_groups: [space1,space2]
   plan:
   - get: cg-customer-broker
     passed: [create-bind-purge, another-space]
@@ -222,7 +219,7 @@ jobs:
   - *cleanup-task
 
 - name: package-broker
-  serial_groups: [serial]
+  serial_groups: [space1,space2]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -237,7 +234,7 @@ jobs:
       file: output/simple-service-broker.zip
 
 - name: verify-candidate-zip
-  serial_groups: [serial]
+  serial_groups: [space1,space2]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -252,6 +249,7 @@ jobs:
       << : *broker-zip-url
 
 - name: deploy-stratos
+  serial_groups: [stratos]
   plan:
   - aggregate:
     - get: cg-customer-broker
@@ -264,6 +262,7 @@ jobs:
       << : *stratos-hostname
 
 - name: delete-stratos
+  serial_groups: [stratos]
   plan:
   - aggregate:
     - get: cg-customer-broker
