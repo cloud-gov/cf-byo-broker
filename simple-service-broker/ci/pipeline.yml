@@ -44,6 +44,8 @@ resources:
     branch: master
     depth: 1
     paths: [simple-service-broker/*]
+    username: ((github_username))
+    password: ((github_password))
 
 - name: broker-source
   type: git
@@ -51,6 +53,8 @@ resources:
     uri: https://github.com/rscale-training/simple-service-broker.git
     branch: master
     depth: 1
+    username: ((github_username))
+    password: ((github_password))
 
 - name: stratos
   type: git
@@ -59,6 +63,8 @@ resources:
     tag_filter: stable
     branch: v2-master
     depth: 1
+    username: ((github_username))
+    password: ((github_password))
 
 - name: broker-artifact
   type: s3
