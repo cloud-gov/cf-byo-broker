@@ -160,7 +160,7 @@ jobs:
       trigger: true
       passed: [marketplace-via-cli]
   - task: create-service-broker
-    file: cg-customer-broker/simple-service-broker/ci/tasks/create-service-broker.yml
+    file: cg-customer-broker/simple-service-broker/ci/tasks/create-service-broker-another-space.yml
     params:
       CF_ANOTHER_SPACE: ((cf_another_space))
       << : *cf-params
