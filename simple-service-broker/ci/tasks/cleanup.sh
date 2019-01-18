@@ -13,4 +13,4 @@ cf delete -f -r $BROKER_APPNAME || echo "App could not be deleted: ${BROKER_APPN
 
 cf t -s $CF_ANOTHER_SPACE
 
-cf delete-service-broker -f ${BROKER_APPNAME}-${CF_ORG}-${CF_ANOTHER_xSPACE} || echo "Could not delete service broker: ${BROKER_APPNAME}"
+cf delete-service-broker -f ${BROKER_APPNAME}-${CF_ORG}-${CF_ANOTHER_SPACE} || echo "Could not delete service broker: ${BROKER_APPNAME}"
