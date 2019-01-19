@@ -49,6 +49,7 @@ clean-params: &cleanup-params
       <<: *gcp-service-broker-app-name
       <<: *gcp-service-broker-name
       <<: *tutorial-trades-service-instance-name
+      <<: *trades-app-name
 
 
 resources:
@@ -122,8 +123,8 @@ jobs:
   plan:
   - aggregate:
     - get: cg-customer-broker
-#      passed: [create-service-broker]
-#      trigger: true
+      passed: [create-service-broker]
+      trigger: true
   - task: create-trades-service-instance
     file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-trades-service-instance.yml
     params:
@@ -143,8 +144,8 @@ jobs:
   plan:
   - aggregate:
     - get: cg-customer-broker
-    #      passed: [create-trades-service-instance]
-    #      trigger: true
+          passed: [create-trades-service-instance]
+          trigger: true
     - get: trades-release
       version: { tag: 'latest' }
   - task: exercise-trades-service-instance
@@ -153,20 +154,20 @@ jobs:
       <<: *cf-params
       <<: *tutorial-trades-service-instance-name
       <<: *trades-app-name
-#    on_failure: &cleanup-task
-#      task: cleanup
-#      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
-#      params:
-#        << : *cleanup-params
+    on_failure: &cleanup-task
+      task: cleanup
+      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+      params:
+        << : *cleanup-params
 
 # Cleanup all resources created by the pipeline.
-#- name: cleanup
-#  serial_groups: [keep-it-simple]
-#  plan:
-#  - get: cg-customer-broker
-#    passed: [create-trades-service-instance]
-#    trigger: true
-#  - task: cleanup
-#    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
-#    params:
-#      << : *cleanup-params
+- name: cleanup
+  serial_groups: [keep-it-simple]
+  plan:
+  - get: cg-customer-broker
+    passed: [create-trades-service-instance]
+    trigger: true
+  - task: cleanup
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+    params:
+      << : *cleanup-params
