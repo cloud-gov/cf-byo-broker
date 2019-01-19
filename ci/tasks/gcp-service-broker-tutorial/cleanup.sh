@@ -16,6 +16,6 @@ set -e
 #     * Service Instance
 #     * Service Broker
 #     * Service Broker Application
-cf ds $TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE_NAME -f || echo "Failed deleting service instance : ${TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE_NAME}"
+cf ds $TUTORIAL_TRADES_SERVICE_INSTANCE_NAME -f || echo "Failed deleting service instance : ${TUTORIAL_TRADES_SERVICE_INSTANCE_NAME}"
 #cf delete-service-broker $GCP_SERVICE_BROKER_NAME -f || echo "App could not be deleted: ${GCP_SERVICE_BROKER_NAME}"
 #cf d -f $GCP_SERVICE_BROKER_APP_NAME  || echo "App could not be deleted: ${GCP_SERVICE_BROKER_APP_NAME}"

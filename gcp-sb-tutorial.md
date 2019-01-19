@@ -47,7 +47,7 @@ gcpspanner   google-spanner          sandbox             spanner-sample-sjw   cr
 
 ### Deploy Spanner Application
 
-Now it is time to deploy an application to use the Spanner service. The first step is to copy the example application and associated manifest.yml from ???Need to determine where the artifact will be housed. For now it can be built by executing `mvn clean package` in the `gcp-spanner-example` directory???
+Now it is time to deploy an application to use the Spanner service. The first step is to copy the example application and associated manifest.yml from ???Need to determine where the artifact will be housed. For now it can be built by executing `mvn clean package` in the `trades` directory???
 
 The next step is to deploy the application. Do not start the application yet. You'll need to bind the service to the application and then it'll be ready to start.
 

@@ -12,4 +12,4 @@ this_directory=`dirname "$0"`
 
 fly -t ${target} set-pipeline -p simple-service-broker-tutorial -c ${this_directory}/../simple-service-broker/ci/pipeline.yml
 
-fly -t ${target} set-pipeline -p gcp-spanner-broker-tutorial -c ${this_directory}/gcp-spanner-broker-tutorial.yml
+fly -t ${target} set-pipeline -p trades-broker-tutorial -c ${this_directory}/trades-broker-tutorial.yml

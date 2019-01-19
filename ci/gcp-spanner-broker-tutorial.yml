@@ -21,19 +21,19 @@ gcp-service-broker-name: &gcp-service-broker-name
       GCP_SERVICE_BROKER_NAME: gcp-service-broker
 
 # The GCP Spanner service as listed in the CF marketplace
-gcp-spanner-service: &gcp-spanner-service
-      GCP_SPANNER_SERVICE: google-spanner
+trades-service: &trades-service
+      TRADES_SERVICE: google-spanner
 
 # The GCP Spanner service plan
-gcp-spanner-service-plan: &gcp-spanner-service-plan
-      GCP_SPANNER_SERVICE_PLAN: sandbox
+trades-service-plan: &trades-service-plan
+      TRADES_SERVICE_PLAN: sandbox
 
-gcp-spanner-example-app-name: &gcp-spanner-example-app-name
-      GCP_SPANNER_EXAMPLE_APP_NAME: gcp-spanner-example
+trades-app-name: &trades-app-name
+      TRADES_APP_NAME: trades
 
 # The name of the tutorial's GCP Spanner service instance
-tutorial-gcp-spanner-service-instance-name: &tutorial-gcp-spanner-service-instance-name
-      TUTORIAL_GCP_SPANNER_SERVICE_INSTANCE_NAME: tutorial-gcp-spanner-service-instance
+tutorial-trades-service-instance-name: &tutorial-trades-service-instance-name
+      TUTORIAL_TRADES_SERVICE_INSTANCE_NAME: tutorial-trades-service-instance
 
 # Cloud Foundry parameters
 cf-params: &cf-params
@@ -48,7 +48,7 @@ clean-params: &cleanup-params
       <<: *cf-params
       <<: *gcp-service-broker-app-name
       <<: *gcp-service-broker-name
-      <<: *tutorial-gcp-spanner-service-instance-name
+      <<: *tutorial-trades-service-instance-name
 
 
 resources:
@@ -68,11 +68,11 @@ resources:
     depth: 1
 
 
-- name: gcp-spanner-example-release
+- name: trades-release
   type: github-release
   source:
     owner: primetimesoftware
-    repository: gcp-spanner-example
+    repository: trades
     access_token: ((github_password))
 
 jobs:
@@ -117,20 +117,20 @@ jobs:
         << : *cleanup-params
 
 # Create the GCP spanner service instance which the app will use
-- name: create-gcp-spanner-service-instance
+- name: create-trades-service-instance
   serial_groups: [keep-it-simple]
   plan:
   - aggregate:
     - get: cg-customer-broker
 #      passed: [create-service-broker]
 #      trigger: true
-  - task: create-gcp-spanner-service-instance
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-gcp-spanner-service-instance.yml
+  - task: create-trades-service-instance
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-trades-service-instance.yml
     params:
       <<: *cf-params
-      <<: *gcp-spanner-service
-      <<: *gcp-spanner-service-plan
-      <<: *tutorial-gcp-spanner-service-instance-name
+      <<: *trades-service
+      <<: *trades-service-plan
+      <<: *tutorial-trades-service-instance-name
     on_failure: &cleanup-task
       task: cleanup
       file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
@@ -138,21 +138,21 @@ jobs:
         << : *cleanup-params
 
 # Exercise the GCP Spanner service instance
-- name: exercise-gcp-spanner-service-instance
+- name: exercise-trades-service-instance
   serial_groups: [keep-it-simple]
   plan:
   - aggregate:
     - get: cg-customer-broker
-    #      passed: [create-gcp-spanner-service-instance]
+    #      passed: [create-trades-service-instance]
     #      trigger: true
-    - get: gcp-spanner-example-release
+    - get: trades-release
       version: { tag: 'latest' }
-  - task: exercise-gcp-spanner-service-instance
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-gcp-spanner-service-instance.yml
+  - task: exercise-trades-service-instance
+    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-trades-service-instance.yml
     params:
       <<: *cf-params
-      <<: *tutorial-gcp-spanner-service-instance-name
-      <<: *gcp-spanner-example-app-name
+      <<: *tutorial-trades-service-instance-name
+      <<: *trades-app-name
 #    on_failure: &cleanup-task
 #      task: cleanup
 #      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
@@ -164,7 +164,7 @@ jobs:
 #  serial_groups: [keep-it-simple]
 #  plan:
 #  - get: cg-customer-broker
-#    passed: [create-gcp-spanner-service-instance]
+#    passed: [create-trades-service-instance]
 #    trigger: true
 #  - task: cleanup
 #    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
