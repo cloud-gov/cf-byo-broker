@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set +x
+set -x
 set -e
 
 . cg-customer-broker/ci/tasks/common.sh
