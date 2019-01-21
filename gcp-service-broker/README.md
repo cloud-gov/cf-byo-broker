@@ -8,7 +8,7 @@
     * [Allow Access Externally](#external-db-access)
     * [Create Database](#create-db)
   * [Service Broker Application Deployment](#deploy-app)
-    * [Clone the GCP Service Broker Repository](clone-broker-app)
+    * [Clone the GCP Service Broker Repository](#clone-broker-app)
     * [Set required environment variables](#required-env)
     * [Push Service Broker to CF](#push-service-broker)
   * [Create a Spanner Service](#create-spanner-service)
@@ -18,7 +18,8 @@
 <a name="space-scoped-broker"></a>
 # Adding a Space Scoped GCP Service Broker 
 
-This tutorial walks you through the steps of adding the GCP Service Broker to a Cloud Foundry space as an application and then deploys an application to demonstrate how to use the Broker to access the GCP Spanner service.
+This tutorial walks you through the steps of adding the GCP Service Broker to a Cloud Foundry space as an application and 
+then deploys an application to demonstrate how to use the Broker to access the GCP Spanner service.
 
 <a name="broker-installation"></a>
 ## Broker Installation
@@ -130,8 +131,8 @@ Add these to the `env` section of `manifest.yml`
 
 <a name="push-service-broker"></a>
 #### Push Service Broker to CF
-1. `cf push gcp-service-broker`
-1. `cf create-service-broker <service broker name> <username> <password> <service broker url> --space-scoped`
+1. `cf push`  # Take note of the URL. It is used in the next command.
+1. `cf create-service-broker gcp-spanner-service-broker <username> <password> <service broker app url> --space-scoped`
 
 <b>Checking your work</b>
 Once the broker is installed, the services will be available in the marketplace. Executing the marketplace command shows the GCP service are now available. 
@@ -154,7 +155,7 @@ google-spanner                  sandbox, minimal-production
 <a name="create-spanner-service"></a>
 ### Create a Spanner Service
 
-\> `cf create-servcie <service broker name> sandbox gcpspanner -c '{"name":"auth-database"}'`
+\> `cf create-servcie google-spanner sandbox trades-spanner -c '{"name":"auth-database"}'`
 
 <b>Checking your work</b>
 Once the service has been create, executing the `services` command shows it as an available service in the space.
@@ -164,29 +165,47 @@ Once the service has been create, executing the `services` command shows it as a
 ```$ cf services
 Getting services in org 18f / space development as steve.wall@primetimesoftware.com...
 
-name         service                 plan                bound apps           last operation
-gcpspanner   google-spanner          sandbox             spanner-sample-sjw   create succeeded
+name             service                 plan                bound apps           last operation
+trades-spanner   google-spanner          sandbox             trades               create succeeded
 ```
 
 <a name="deploy-spanner-app"><a>
 ### Deploy Spanner Application
 
-Now it is time to deploy an application to use the Spanner service. The first step is to copy the example application and associated manifest.yml from ???Need to determine where the artifact will be housed. For now it can be built by executing `mvn clean package` in the `trades` directory???
+Now it is time to deploy an application to use the Spanner service. The first step is to copy the example application 
+and associated manifest.yml. For this, you will use the 
+[Trades](https://github.com/primetimesoftware/trades) example Spanner applications.
 
-The next step is to deploy the application. Do not start the application yet. You'll need to bind the service to the application and then it'll be ready to start.
+Navigate to the [Trades release page](https://github.com/primetimesoftware/trades/releases) and download the latest 
+trades.zip release.
+
+Create a working directory, copy the trades.zip to the directory, and expand the zip file.
+
+\> mkdir trades-working
+\> cd trades-working
+\> cp ~/Downloads/trades.zip
+\> unzip trades.zip
+
+The next step is to deploy the application. Do not start the application yet. You'll need to bind the service to the 
+application and then it'll be ready to start.
 
 \> `cf p --nostart`
 
-Now you are ready to bind the service to the application. Binding the service adds the required connection information to the application `VCAP_SERVICES` environment variable.
+The Trades application uses a `random-route` when deploying the application. Take note of the application url.
 
-\> `cf bs spanner-sample-<unique id> gcpspanner -c '{"role":"spanner.databaseAdmin"}'`
+Now you are ready to bind the service to the application. Binding the service adds the required connection information 
+to the application `VCAP_SERVICES` environment variable.
+
+\> `cf bs trades gcpspanner -c '{"role":"spanner.databaseAdmin"}'`
 
 <b>Checking your work</b>
 
-\> `$ cf env spanner-sample-sjw`
+If the service is properly bound, you'll see a `google-spanner` section in the `VCAP_SERVICES` environment variable.
+
+\> `$ cf env trades`
 
 ```
-Getting env variables for app spanner-sample-sjw in org 18f / space development as steve.wall@primetimesoftware.com...
+Getting env variables for app trades-lemur in org 18f / space development as steve.wall@primetimesoftware.com...
 OK
 
 System-Provided:
@@ -220,63 +239,65 @@ System-Provided:
 }
 ```
 
-\> `cf start spanner-sample-<unique id>`
+Once the service is successfully bound, it is time to start the application.
+
+\> `cf start trades`
 
 <b>Checking your work</b>
-To check the application deployed correctly, access the `trader` endpoint from a browers.
+To check the application deployed correctly, access the `trades` endpoint from a browser.
 
-https://<app url>/traders
+https://<app url>/trades
 
 This should return the following json document.
 
 ```
 {
   "_embedded" : {
-    "traders" : [ {
-      "traderId" : "demo_trader1",
+    "trades" : [ {
+      "tradesId" : "demo_trades1",
       "firstName" : "John",
       "lastName" : "Doe",
       "_links" : {
         "self" : {
-          "href" : "https://spanner-sample-sjw.cfapps.io/traders/demo_trader1"
+          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades1"
         },
-        "trader" : {
-          "href" : "https://spanner-sample-sjw.cfapps.io/traders/demo_trader1"
+        "trades" : {
+          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades1"
         }
       }
     }, {
-      "traderId" : "demo_trader2",
+      "tradesId" : "demo_trades2",
       "firstName" : "Mary",
       "lastName" : "Jane",
       "_links" : {
         "self" : {
-          "href" : "https://spanner-sample-sjw.cfapps.io/traders/demo_trader2"
+          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades2"
         },
-        "trader" : {
-          "href" : "https://spanner-sample-sjw.cfapps.io/traders/demo_trader2"
+        "trades" : {
+          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades2"
         }
       }
     }, {
-      "traderId" : "demo_trader3",
+      "tradesId" : "demo_trades3",
       "firstName" : "Scott",
       "lastName" : "Smith",
       "_links" : {
         "self" : {
-          "href" : "https://spanner-sample-sjw.cfapps.io/traders/demo_trader3"
+          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades3"
         },
-        "trader" : {
-          "href" : "https://spanner-sample-sjw.cfapps.io/traders/demo_trader3"
+        "trades" : {
+          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades3"
         }
       }
     } ]
   },
   "_links" : {
     "self" : {
-      "href" : "https://spanner-sample-sjw.cfapps.io/traders{?page,size,sort}",
+      "href" : "https://trades-lemur.cfapps.io/trades{?page,size,sort}",
       "templated" : true
     },
     "profile" : {
-      "href" : "https://spanner-sample-sjw.cfapps.io/profile/traders"
+      "href" : "https://trades-lemur.cfapps.io/profile/trades"
     }
   },
   "page" : {
@@ -295,6 +316,8 @@ Through the course of the tutorial, there were several things created in your CF
 hanging around consuming resources, so now it's time to cleanup! This essentially involves deleting the items that were
 created in reverse order.
 
-1. Delete the Trader application.
+1. Delete the Trades application.
+
+`cf d trades`
 
 
