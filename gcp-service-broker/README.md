@@ -1,4 +1,7 @@
-# [Adding a Space Scoped GCP Service Broker](#space-scoped-broker) 
+# Table of Contents
+[Adding a Space Scoped GCP Service Broker](#space-scoped-broker) 
+
+# Adding a Space Scoped GCP Service Broker <a name="space-scoped-broker"></a>
 
 This tutorial walks you through the steps of adding the GCP Service Broker to a Cloud Foundry space as an application and then deploys an application to demonstrate how to use the Broker to access the GCP Spanner service.
 
