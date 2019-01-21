@@ -131,7 +131,7 @@ Add these to the `env` section of `manifest.yml`
 
 <a name="push-service-broker"></a>
 #### Push Service Broker to CF
-1. `cf push`  # Take note of the URL. It is used in the next command.
+1. `cf p`  # Take note of the URL. It is used in the next command.
 1. `cf create-service-broker gcp-spanner-service-broker <username> <password> <service broker app url> --space-scoped`
 
 <b>Checking your work</b>
@@ -316,8 +316,28 @@ Through the course of the tutorial, there were several things created in your CF
 hanging around consuming resources, so now it's time to cleanup! This essentially involves deleting the items that were
 created in reverse order.
 
-1. Delete the Trades application.
+* Delete the Trades application.
 
-`cf d trades`
+\> `cf d trades`
 
 
+* Delete the service instance.
+
+\> `cf ds trades-spanner`
+
+* Delete the service broker.
+
+\> `cf delete-service-broker gcp-spanner-service-broker`
+
+* Delete the GCP Service Broker application.
+
+\> `cf d gcp-service-broker`
+
+<b>Checking your work</b>
+
+Running `cf a` should show the Trades and GCP Service Broker applications are
+no longer deployed.
+
+Running `cf s` should show the service no longer exists.
+
+Running `cf service-brokers` should show the service broker no longer exists.
