@@ -1,15 +1,32 @@
 # Table of Contents
-[Adding a Space Scoped GCP Service Broker](#space-scoped-broker) 
-
-# Adding a Space Scoped GCP Service Broker <a name="space-scoped-broker"></a>
+* [Broker Installation](#broker-installation)
+  * [Setup GCP Project](#project)
+  * [Enable APIs](#apis)
+  * [Create Root Service Account](#service-account)
+  * [Setup Backing Database](#database-setup)
+    * [Create MySQL Instance](#create-mysql-instance)
+    * [Allow Access Externally](#external-db-access)
+    * [Create Database](#create-db)
+  * [Service Broker Application Deployment](#deploy-app)
+    * [Clone the GCP Service Broker Repository](clone-broker-app)
+    * [Set required environment variables](#required-env)
+    * [Push Service Broker to CF](#push-service-broker)
+  * [Create a Spanner Service](#create-spanner-service)
+  * [Deploy Spanner Application](#deploy-spanner-app)
+* [Cleanup](#cleanup)
+    
+<a name="space-scoped-broker"></a>
+# Adding a Space Scoped GCP Service Broker 
 
 This tutorial walks you through the steps of adding the GCP Service Broker to a Cloud Foundry space as an application and then deploys an application to demonstrate how to use the Broker to access the GCP Spanner service.
 
-## [Broker Installation](#broker-installation)
+<a name="broker-installation"></a>
+## Broker Installation
 
 Installing a GCP Service Broker involves setting up 
 
-### [Setup GCP Project](#project)
+<a name="project"></a>
+### Setup GCP Project
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com) and sign up, walking through the setup wizard.
 1. Next to the Google Cloud Platform logo in the upper left-hand corner, click the dropdown. In the popup, select "New Project"
@@ -18,7 +35,8 @@ in the upper right.
 1. A notification in the upper right indicates when the project is created. Refresh the page.
 1. You may need to select the newly created project from the project drop down in the upper left.
 
-### [Enable APIs](#apis)
+<a name="api"></a>
+### Enable APIs
 
 Enable the following services in **[APIs & Services > Library](https://console.cloud.google.com/apis/library)**.
 
@@ -26,7 +44,8 @@ Enable the following services in **[APIs & Services > Library](https://console.c
 1. Enable the [Google Identity and Access Management (IAM) API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview)
 1. Enable the [Cloud Spanner API](https://console.cloud.google.com/apis/library/spanner.googleapis.com?q=spanner)
 
-### [Create Root Service Account](#service-account)
+<a name="service-account"></a>
+### Create Root Service Account
 
 1. From the GCP console, navigate to **IAM & Admin > Service accounts** and click **Create Service Account**.
 1. Enter a **Service account name**.
@@ -35,11 +54,13 @@ Enable the following services in **[APIs & Services > Library](https://console.c
 1. Click **Save** to create the account, key and grant it the owner permission.
 1. Save the automatically downloaded key file to a secure location.
 
-### [Setup Backing Database](#database-setup)
+<a name="database-setup"></a>
+### Setup Backing Database
 
 The GCP Service Broker stores the state of provisioned resources in a MySQL database. This will be done
 by creating a CloudSQL, MySQL instance.
 
+<a name="create-mysql-instance"></a>
 #### Create MySQL Instance
 
 1. Select "Marketplace" from the dropdown in the upper right.
@@ -53,7 +74,8 @@ by creating a CloudSQL, MySQL instance.
 1. Select the "Create" button.
 1. Select the "Next" button.
 
-#### [Allow Access Externally](#external-db-access)
+<a name="external-db-access"></a>
+#### Allow Access Externally
 
 By default the database cannot be accessed by external IPs. These next steps open the database to external access.
 
@@ -63,7 +85,8 @@ By default the database cannot be accessed by external IPs. These next steps ope
 1. For "Network" enter, `0.0.0.0/0`
 1. Select the "Done" button.
 
-#### [Create Database](#create-db)
+<a name="create-db"></a>
+#### Create Database
 
 Now that the instance has been created, it's time to the Service Broker database within the instance. The following 
 use Google's Cloud Shell to connect to the MySQL instance and creates the required database and user that the
@@ -80,15 +103,21 @@ Just press "Return".
 1. Run `GRANT ALL PRIVILEGES ON servicebroker.* TO '<username>'@'%' WITH GRANT OPTION;`
 1. Exit from the shell.
 
-### [Service Broker Application Deployment](#deploy-db)
+<a name="deploy-app"></a>
+### Service Broker Application Deployment
 
 Now that the database is setup, you are ready to deploy the Service Broker as an application to Cloud Foundry.
 
-### Clone the GCP Service Broker Repository
+<a name="clone-broker-repo"></a>
+#### Clone the GCP Service Broker Repository
+The first step to installing the GCP Service Broker is cloning the github repository where the source of the broker
+resides. Clone this repository into a working directory and then change directory to the clone repo.
 
-/> git clone https://github.com/GoogleCloudPlatform/gcp-service-broker.git
+\> git clone https://github.com/GoogleCloudPlatform/gcp-service-broker.git
+\> cd gcp-service-broker
 
-### [Set required environment variables](#required-env)
+<a name="required-env"></a>
+#### Set required environment variables
 
 Add these to the `env` section of `manifest.yml`
 
@@ -99,7 +128,8 @@ Add these to the `env` section of `manifest.yml`
 * `DB_USERNAME` - the database username for the service broker to use.
 * `DB_PASSWORD` - the database password for the service broker to use.
 
-#### [Push Service Broker to CF](#push)
+<a name="push-service-broker"></a>
+#### Push Service Broker to CF
 1. `cf push gcp-service-broker`
 1. `cf create-service-broker <service broker name> <username> <password> <service broker url> --space-scoped`
 
@@ -121,7 +151,8 @@ google-spanner                  sandbox, minimal-production
 ...
 ```
 
-### [Create a Spanner Service](#create-spanner-service)
+<a name="create-spanner-service"></a>
+### Create a Spanner Service
 
 \> `cf create-servcie <service broker name> sandbox gcpspanner -c '{"name":"auth-database"}'`
 
@@ -137,7 +168,8 @@ name         service                 plan                bound apps           la
 gcpspanner   google-spanner          sandbox             spanner-sample-sjw   create succeeded
 ```
 
-### [Deploy Spanner Application](#deploy-spanner-app)
+<a name="deploy-spanner-app"><a>
+### Deploy Spanner Application
 
 Now it is time to deploy an application to use the Spanner service. The first step is to copy the example application and associated manifest.yml from ???Need to determine where the artifact will be housed. For now it can be built by executing `mvn clean package` in the `trades` directory???
 
@@ -256,10 +288,13 @@ This should return the following json document.
 }
 ```
 
-## [Cleanup](#cleanup)
+<a name="cleanup"></a>
+## Cleanup
 
 Through the course of the tutorial, there were several things created in your CF space. We don't have to leave things
 hanging around consuming resources, so now it's time to cleanup! This essentially involves deleting the items that were
 created in reverse order.
+
+1. Delete the Trader application.
 
 
