@@ -51,7 +51,6 @@ clean-params: &cleanup-params
       <<: *tutorial-trades-service-instance-name
       <<: *trades-app-name
 
-
 resources:
 
 - name: cg-customer-broker
@@ -86,14 +85,14 @@ jobs:
     - get: cg-customer-broker
     - get: gcp-service-broker
   - task: deploy-gcp-service-broker
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/deploy-gcp-service-broker.yml
+    file: cg-customer-broker/gcp-service-broker/ci/tasks/deploy-gcp-service-broker.yml
     params:
       << : *cf-params
       << : *gcp-service-broker-manifest-params
       ROOT_SERVICE_ACCOUNT_JSON: ((root_service_account_json))
     on_failure:
       task: cleanup
-      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+      file: cg-customer-broker/gcp-service-broker/ci/tasks/cleanup.yml
       params:
         << : *cleanup-params
 
@@ -105,7 +104,7 @@ jobs:
     passed: [deploy-gcp-service-broker]
     trigger: true
   - task: create-service-broker
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-service-broker.yml
+    file: cg-customer-broker/gcp-service-broker/ci/tasks/create-service-broker.yml
     params:
       << : *cf-params
       << : *gcp-service-broker-app-name
@@ -113,7 +112,7 @@ jobs:
       << : *gcp-service-broker-name
     on_failure:
       task: cleanup
-      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+      file: cg-customer-broker/gcp-service-broker/ci/tasks/cleanup.yml
       params:
         << : *cleanup-params
 
@@ -126,7 +125,7 @@ jobs:
       passed: [create-service-broker]
       trigger: true
   - task: create-trades-service-instance
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/create-trades-service-instance.yml
+    file: cg-customer-broker/gcp-service-broker/ci/tasks/create-trades-service-instance.yml
     params:
       <<: *cf-params
       <<: *trades-service
@@ -134,7 +133,7 @@ jobs:
       <<: *tutorial-trades-service-instance-name
     on_failure:
       task: cleanup
-      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+      file: cg-customer-broker/gcp-service-broker/ci/tasks/cleanup.yml
       params:
         << : *cleanup-params
 
@@ -149,14 +148,14 @@ jobs:
     - get: trades-release
       version: { tag: 'latest' }
   - task: exercise-trades-service-instance
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-trades-service-instance.yml
+    file: cg-customer-broker/gcp-service-broker/ci/tasks/exercise-trades-service-instance.yml
     params:
       <<: *cf-params
       <<: *tutorial-trades-service-instance-name
       <<: *trades-app-name
     on_failure:
       task: cleanup
-      file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+      file: cg-customer-broker/gcp-service-broker/ci/tasks/cleanup.yml
       params:
         << : *cleanup-params
 
@@ -168,6 +167,6 @@ jobs:
     passed: [exercise-trades-service-instance]
     trigger: true
   - task: cleanup
-    file: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/cleanup.yml
+    file: cg-customer-broker/gcp-service-broker/ci/tasks/cleanup.yml
     params:
       << : *cleanup-params

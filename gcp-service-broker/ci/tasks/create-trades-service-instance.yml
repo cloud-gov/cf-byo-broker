@@ -9,10 +9,9 @@ image_resource:
 
 inputs:
 - name: cg-customer-broker
-- name: trades-release
 
 run:
-  path: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/exercise-trades-service-instance.sh
+  path: cg-customer-broker/gcp-service-broker/ci/tasks/create-trades-service-instance.sh
 
 params:
   CF_API:
@@ -20,5 +19,6 @@ params:
   CF_PWD:
   CF_ORG:
   CF_SPACE:
+  TRADES_SERVICE:
+  TRADES_SERVICE_PLAN:
   TUTORIAL_TRADES_SERVICE_INSTANCE_NAME:
-  TRADES_APP_NAME:

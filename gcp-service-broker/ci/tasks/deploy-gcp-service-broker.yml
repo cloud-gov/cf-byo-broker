@@ -12,7 +12,7 @@ inputs:
 - name: gcp-service-broker
 
 run:
-  path: cg-customer-broker/ci/tasks/gcp-service-broker-tutorial/deploy-gcp-service-broker.sh
+  path: cg-customer-broker/gcp-service-broker/ci/tasks/deploy-gcp-service-broker.sh
 
 params:
   CF_API:
