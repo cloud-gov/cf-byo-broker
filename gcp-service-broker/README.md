@@ -19,6 +19,10 @@
 This tutorial walks you through the steps of adding a space scoped GCP Service Broker to Cloud Foundry  and 
 then deploys an application that demonstrate how to use the Broker to access the GCP Spanner service.
 
+Before you begin:
+* please be sure you are logged into a Cloud Foundry instance and targeted to an org and space.
+* please be sure you have a [GCP account established](https://accounts.google.com/).
+
 <a name="gcp-setup"></a>
 ## GCP Setup
 
