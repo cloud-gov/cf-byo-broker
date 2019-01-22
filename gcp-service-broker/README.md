@@ -1,5 +1,5 @@
 # Table of Contents
-* [Broker Installation](#broker-installation)
+* [GCP Setup](#gcp-setup)
   * [Setup GCP Project](#project)
   * [Enable APIs](#apis)
   * [Create Root Service Account](#service-account)
@@ -7,10 +7,8 @@
     * [Create MySQL Instance](#create-mysql-instance)
     * [Allow Access Externally](#external-db-access)
     * [Create Database](#create-db)
-  * [Service Broker Application Deployment](#deploy-app)
-    * [Clone the GCP Service Broker Repository](#clone-broker-app)
-    * [Set required environment variables](#required-env)
-    * [Push Service Broker to CF](#push-service-broker)
+* [Cloud Foundry Setup](#cloud-foundry-setup)
+  * [Service Broker Application Deployment and Registration](#deploy-app)
   * [Create a Spanner Service](#create-spanner-service)
   * [Deploy Spanner Application](#deploy-spanner-app)
 * [Cleanup](#cleanup)
@@ -18,13 +16,15 @@
 <a name="space-scoped-broker"></a>
 # Adding a Space Scoped GCP Service Broker 
 
-This tutorial walks you through the steps of adding the GCP Service Broker to a Cloud Foundry space as an application and 
-then deploys an application to demonstrate how to use the Broker to access the GCP Spanner service.
+This tutorial walks you through the steps of adding a space scoped GCP Service Broker to Cloud Foundry  and 
+then deploys an application that demonstrate how to use the Broker to access the GCP Spanner service.
 
-<a name="broker-installation"></a>
-## Broker Installation
+<a name="gcp-setup"></a>
+## GCP Setup
 
-Installing a GCP Service Broker involves setting up 
+The first step to setting up a GCP Service Broker requires setup on the GCP side. This involves GCP project, enabling the appropriate services in
+the project, creating a service, and then creating a MySQL database that will be used by the Service Broker. The following
+steps guide you through this process.
 
 <a name="project"></a>
 ### Setup GCP Project
@@ -58,13 +58,13 @@ Enable the following services in **[APIs & Services > Library](https://console.c
 <a name="database-setup"></a>
 ### Setup Backing Database
 
-The GCP Service Broker stores the state of provisioned resources in a MySQL database. This will be done
-by creating a CloudSQL, MySQL instance.
+The GCP Service Broker stores the state of provisioned resources in a MySQL database. This will created using
+the Cloud SQL service.
 
 <a name="create-mysql-instance"></a>
 #### Create MySQL Instance
 
-1. Select "Marketplace" from the dropdown in the upper right.
+1. In the GCP console, select "Marketplace" from the dropdown in the upper right.
 1. Enter "MySQL" in the search box.
 1. Select "Cloud SQL" in the results.
 1. Select the "GO TO CLOUD SQL" button.
@@ -90,7 +90,7 @@ By default the database cannot be accessed by external IPs. These next steps ope
 #### Create Database
 
 Now that the instance has been created, it's time to the Service Broker database within the instance. The following 
-use Google's Cloud Shell to connect to the MySQL instance and creates the required database and user that the
+steps use Google's Cloud Shell to connect to the MySQL instance to create the required database and user that the
 broker will use to connect.
 
 1. Select the "Overview" tab.
@@ -105,32 +105,29 @@ Just press "Return".
 1. Exit from the shell.
 
 <a name="deploy-app"></a>
-### Service Broker Application Deployment
+### Service Broker Application Deployment and Registration
 
 Now that the database is setup, you are ready to deploy the Service Broker as an application to Cloud Foundry.
 
-<a name="clone-broker-repo"></a>
-#### Clone the GCP Service Broker Repository
 The first step to installing the GCP Service Broker is cloning the github repository where the source of the broker
-resides. Clone this repository into a working directory and then change directory to the clone repo.
+resides. Clone this repository into a working directory and then change to the directory to the clone repo.
 
 \> git clone https://github.com/GoogleCloudPlatform/gcp-service-broker.git
 \> cd gcp-service-broker
 
-<a name="required-env"></a>
-#### Set required environment variables
 
 Add these to the `env` section of `manifest.yml`
 
 * `ROOT_SERVICE_ACCOUNT_JSON` - the string version of the credentials file created for the Owner level Service Account.
-* `SECURITY_USER_NAME` - the username to authenticate broker requests - the same one used in `cf create-service-broker`.
-* `SECURITY_USER_PASSWORD` - the password to authenticate broker requests - the same one used in `cf create-service-broker`.
+* `SECURITY_USER_NAME` - the username to authenticate broker requests - the same one used in `cf create-service-broker` below.
+* `SECURITY_USER_PASSWORD` - the password to authenticate broker requests - the same one used in `cf create-service-broker` below.
 * `DB_HOST` - the host for the database to back the service broker.
 * `DB_USERNAME` - the database username for the service broker to use.
 * `DB_PASSWORD` - the database password for the service broker to use.
 
-<a name="push-service-broker"></a>
-#### Push Service Broker to CF
+Now that the `manifest.yml` is ready, it is time to push the application to Cloud Foundry and register it as a 
+Service Broker.
+
 1. `cf p`  # Take note of the URL. It is used in the next command.
 1. `cf create-service-broker gcp-spanner-service-broker <username> <password> <service broker app url> --space-scoped`
 
@@ -151,6 +148,15 @@ google-spanner                  sandbox, minimal-production
 
 ...
 ```
+
+<a name="cloud-foundry-setup"></a>
+## Cloud Foundry Setup
+With the GCP setup complete, we now direct our attention to setting up the Service Broker within Cloud Foundry. For 
+this tutorial that involves deploying the GCP Service Broker as an application and then registering that application as a
+Service Broker with Cloud Foundry. 
+
+Then we excercise the service broker by create a GCP Spanner service and deploying an example application that uses
+the service.
 
 <a name="create-spanner-service"></a>
 ### Create a Spanner Service
