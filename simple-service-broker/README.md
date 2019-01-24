@@ -434,7 +434,7 @@ When you are done with it, you can clean up by deleting the service broker and t
 
 ## Beyond the Tutorial
 
-* This simple tutorial is designed to introduce you to the concepts and commands related to space-scoped brokers. We recommend you next try to deploy a functional broker by following the [Google Spanner Tutorial]("/gcp-service-broker/README.md")
+* This simple tutorial is designed to introduce you to the concepts and commands related to space-scoped brokers. We recommend you next try to deploy a functional broker by following the [Google Spanner Tutorial]("../gcp-service-broker").
 
 * You can build your own service brokers by implementing the API. Libraries exist in many languages like Spring and GO that allow you to quickly build new brokers. More information is available: [Open Service Broker API](https://www.openservicebrokerapi.org/).
 
