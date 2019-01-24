@@ -330,19 +330,18 @@ The Trades application demonstrates how to read and write POJOs from Google Clou
 
 * Download the latest `trades.zip` release: https://github.com/primetimesoftware/trades/releases/download/latest/trades.zip
 
-* Create a working directory, copy the trades.zip to the directory, and expand the zip file. For example:
+* Unzip the trades.zip, change to the trades directory in preparation for deploying the application.
 
   ```
-  $ mkdir trades-working
-  $ cd trades-working
   $ cp ~/Downloads/trades.zip
   $ unzip trades.zip
+  $ cd trades
   ```
 
 * Deploy the application without starting it:
 
   ```
-  $ cf push --no-start
+  $ cf push -p trades*.zip --no-start
   ```
 
   > NOTE: You may need to use `--random-route` or specify a hostname via `--hostname` to avoid route collisions.
