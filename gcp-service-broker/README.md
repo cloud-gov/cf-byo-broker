@@ -341,7 +341,7 @@ The Trades application demonstrates how to read and write POJOs from Google Clou
 * Deploy the application without starting it:
 
   ```
-  $ cf push -p trades*.zip --no-start
+  $ cf push -p trades*.jar --no-start
   ```
 
   > NOTE: You may need to use `--random-route` or specify a hostname via `--hostname` to avoid route collisions.
