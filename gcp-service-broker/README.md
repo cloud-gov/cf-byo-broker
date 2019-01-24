@@ -333,7 +333,6 @@ The Trades application demonstrates how to read and write POJOs from Google Clou
 * Unzip the trades.zip, change to the trades directory in preparation for deploying the application.
 
   ```
-  $ cp ~/Downloads/trades.zip
   $ unzip trades.zip
   $ cd trades
   ```
