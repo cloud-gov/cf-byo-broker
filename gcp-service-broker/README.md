@@ -1,263 +1,336 @@
-# Table of Contents
+# Google Spanner Service Broker
+
+This tutorial shows you how to deploy the Google Cloud Platform (GCP) service broker to a space on Cloud Foundry. It includes a sample application that will connect to a Google Spanner instance provisioned by the broker.
+
+**Table of Contents**
+
 * [Prerequisites](#prerequisites)
 * [GCP Setup](#gcp-setup)
-  * [Setup GCP Project](#project)
-  * [Enable APIs](#apis)
-  * [Create Root Service Account](#service-account)
-  * [Setup Backing Database](#database-setup)
-    * [Create MySQL Instance](#create-mysql-instance)
-    * [Allow Access Externally](#external-db-access)
-    * [Create Database](#create-db)
-* [Cloud Foundry Setup](#cloud-foundry-setup)
-  * [Service Broker Application Deployment and Registration](#deploy-app)
-    * [Checking Your Work](#check-create-service-broker)
-  * [Create a Spanner Service](#create-spanner-service)
-    * [Check Your Work](#check-spanner-service)
-  * [Deploy Spanner Application](#deploy-spanner-app)
-    * [Check Your Work - Bind](#check-bind-service)
-    * [Check Your Work - Trades App Deploy](#check-trades-app-deploy)
-* [Cleanup](#cleanup)
+  * [Setup GCP Project](#create-gcp-project)
+  * [Enable APIs](#enable-apis)
+  * [Create Root Service Account](#create-root-service-account)
+  * [Service Broker Database](#service-broker-database)
+    * [Provision MySQL](#provision-mysql)
+    * [Allow Database Access](#allow-database-access)
+    * [Create Database and User](#create-database-and-user)
+  * [GCP Setup Recap](#gcp-setup-recap)
+* [Deploying the Broker](#deploying-the-broker)
+  * [Cloning](#cloning)
+  * [Configuring](#configuring)
+  * [Pushing](#pushing)
+  * [Registering](#registering)
+  * [The Marketplace](#the-marketplace)
+* [Using Spanner with a Sample Application](#using-spanner-with-a-sample-application)
+  * [Deploying the Trades Application](#deploying-the-trades-application)
+  * [Creating and Binding](#creating-and-binding)
+  * [Accessing the Trades App](#accessing-the-trades-app)
+* [Conclusion](#conclusion)
+  * [Cleaning Up](#cleaning-up)
 
-
-<a name="space-scoped-broker"></a>
-# Adding a Space Scoped GCP Service Broker 
-
-This tutorial walks you through the steps of adding a space scoped GCP Service Broker to Cloud Foundry  and 
-then deploys an application demonstrating how to use the Broker to access the GCP Spanner service. 
-
-<a name="prerequisites"></a>
 ## Prerequisites
 
-* A working knowledge of the [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/).
-* A working knowledge of Space Scoped Service Brokers. For an excellent introduction, 
-see the [Simple Service Broker Tutorial](https://github.com/resilientscale/cg-customer-broker/tree/master/simple-service-broker)
-* An account to a Cloud Foundry instance. A free account can be established at [Pivotal Web Services](https://run.pivotal.io/).
-* A [Google Cloud Platform (GCP) account](https://accounts.google.com/).
-* Please be sure you are logged into a Cloud Foundry instance and targeted to an org and space.
+In order to complete the tutorial, please be sure you have:
 
-<a name="gcp-setup"></a>
+* A [Google Cloud Platform (GCP) account](https://accounts.google.com/).
+* A working knowledge of Cloud Foundry with experience using the [CLI](https://docs.cloudfoundry.org/cf-cli/).
+* A working knowledge of space-scoped service brokers. For an  introduction, see the [Simple Service Broker Tutorial](/cg-customer-broker/tree/master/simple-service-broker).
+* A Cloud Foundry account and a space to deploy apps.  You need the `SpaceDeveloper` role in the space.
+
 ## GCP Setup
 
-The first step to setting up a GCP Service Broker requires setup on the GCP side. It is assumed you have already setup a 
-GCP account. The steps in this section walk you through setting up a project that will be used by the Service Broker. This 
-involves  enabling the appropriate services in the project, creating a service account, and creating a MySQL database 
-that will be used by the Service Broker as a backing store.
+The GCP service broker will provision and manipulate resources in your Google Cloud Platform project. This section shows you how to create and configure a project that will be used by the service broker.
 
-<a name="project"></a>
 ### Create GCP Project
 
-The first task is to create the project that will be used by the Service Broker.
+The first task is to create the project that will be used by the service broker. In GCP, projects form the basis for creating, enabling, and using all GCP services.
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com).
-1. Next to the Google Cloud Platform logo in the upper left-hand corner, click the dropdown. In the popup, select "New Project"
+1. Sign in to your GCP account: [Google Cloud Console](https://console.cloud.google.com).
+1. Next to the Google Cloud Platform logo in the upper left-hand corner, click the dropdown. In the popup, select `New Project`.
 in the upper right.
-1. Give your project a name and click "Create".
+1. Give your project a name and click `CREATE`.
 1. A notification in the upper right indicates when the project is created. Refresh the page.
-1. You may need to select the newly created project from the project drop down in the upper left.
+1. You may need to select the newly created project from the project drop down in the upper left once it is created.
 
-<a name="api"></a>
 ### Enable APIs
 
-Enable the following services in **[APIs & Services > Library](https://console.cloud.google.com/apis/library)**.
+The service broker utilizes APIs to provision and manipulate resources. By default, APIs are not enabled when you create a project.  
 
-1. Enable the [Google Cloud Resource Manager API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview)
-1. Enable the [Google Identity and Access Management (IAM) API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview)
-1. Enable the [Cloud Spanner API](https://console.cloud.google.com/apis/library/spanner.googleapis.com?q=spanner)
+The following services are required for the broker to provision and manipulate Spanner instances.
 
-<a name="service-account"></a>
+1. In the left hand navigation bar, select `APIs & Services` > `Library`.
+1. Enable the following services:
+  * [Google Cloud Resource Manager API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview)
+  * [Google Identity and Access Management (IAM) API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview)
+  * [Cloud Spanner API](https://console.cloud.google.com/apis/library/spanner.googleapis.com?q=spanner)
+
+> NOTE: The GCP Service Broker supports a multitude of services in addition to Spanner. While this tutorial focuses on only enabling Spanner, you can enable additional services by following the instructions here: https://github.com/GoogleCloudPlatform/gcp-service-broker.
+
 ### Create Root Service Account
 
-A root service account is used by the Service Broker to access the GCP project. In this section you will create
+A root service account is used by the service broker to access the GCP project. In this section you will create
 the root service account and download a JSON document with the corresponding connection information. This JSON doc
-will be used by the Service Broker to connect to the GCP project in a later section.
+will be used by the service broker to connect to the GCP project in a later section.
 
-1. From the GCP console, navigate to **IAM & Admin > Service accounts** and click **Create Service Account**.
-1. Enter a **Service account name**.
-1. In the **Project Role** dropdown, choose **Project > Owner**.
-1. Select the checkbox to **Furnish a new Private Key**, make sure the **JSON** key type is specified.
-1. Click **Save** to create the account, key and grant it the owner permission.
-1. Save the automatically downloaded key file to a secure location.
+1. From the GCP console, navigate to `IAM & admin` > `Service accounts` and click `Create Service Account`.
+1. Enter a descriptive `Service account name` (for example *gcp-service-broker*) then click `CREATE`.
+1. In the `Project Role` dropdown, choose `Project` > `Owner` then click `CONTINUE`.
+1. On the next screen, click `+ CREATE KEY`. Be sure `JSON` is selected as the key type and select `CREATE`. A key file will be generated and downloaded to your computer.
+1. Accept the confirmation and click `DONE`.
 
-<a name="database-setup"></a>
-### Setup Backing Database
+> Be sure you protect the json key file. This file contains credentials that can be used to access your account. If you lose this file, you cannot retrieve it. You will have to generate a new set of credentials.
 
-The GCP Service Broker stores the state of provisioned resources in a MySQL database. This will created using
-the Cloud SQL service.
+### Service Broker Database
 
-<a name="create-mysql-instance"></a>
-#### Create MySQL Instance
+The GCP service broker stores the state of provisioned resources in a MySQL database. We will use the Google Cloud SQL service for this.
 
-1. In the GCP console, select "Marketplace" from the dropdown in the upper right.
-1. Enter "MySQL" in the search box.
-1. Select "Cloud SQL" in the results.
-1. Select the "GO TO CLOUD SQL" button.
-1. Select the "Create Instance" button.
-1. Select the "MySQL" radio button.
-1. Select the "Choose Second Generation" button.
-1. Give you instance a name and root password.
-1. Select the "Create" button.
-1. Select the "Next" button.
+#### Provision MySQL
 
-<a name="external-db-access"></a>
-#### Allow Access Externally
+1. In the GCP console, select `Marketplace`.
+1. Enter `MySQL` in the search box.
+1. Select `Cloud SQL` in the results.
+1. Select the `GO TO CLOUD SQL` button.
+1. Select the `Create Instance` button.
+1. Select the `MySQL` radio button.
+1. Select the `Choose Second Generation` button.
+1. Give you instance a name and root password. Be sure to remember your root password!
+1. Select the `Create` button.
+1. Select the `Next` button.
 
-By default the database cannot be accessed by external IPs. These next steps open the database to external access.
+#### Allow Database Access
 
-1. Select the newly created instance from the list, which brings you to the "Instance details".
-1. Select the "Connections" tab.
-1. Select the "+ Add network" push button.
-1. For "Network" enter, `0.0.0.0/0`
-1. Select the "Done" button.
+By default the database cannot be accessed from external IPs. Since our broker will be running Cloud Foundry, we need to allow access. These next steps open the database to external access.
 
-<a name="create-db"></a>
-#### Create Database
+1. Select the newly created instance from the list, which brings you to the `Instance details`.
+1. Select the `Connections` tab.
+1. Select the `+ Add network` push button.
+1. For `Network` enter, `0.0.0.0/0`
+1. Select the `Done` button.
 
-Now that the instance has been created, it's time to the Service Broker database within the instance. The following 
-steps use Google's Cloud Shell to connect to the MySQL instance to create the required database and user that the
-broker will use to connect.
+> NOTE: The `Network` value of `0.0.0.0/0` will allow connections from any IP. We recommend you contact your Cloud Foundry administrator for the limited IP range on which applications are deployed.
 
-1. Select the "Overview" tab.
-1. In the "Connect to this instance" section, select "Connect using Cloud Shell".
+#### Create Database and User
+
+The following steps use Google's Cloud Shell to connect to the MySQL instance to create the required database and user that the broker will use to connect.
+
+1. Select the `Overview` tab.
+1. In the `Connect to this instance` section, select `Connect using Cloud Shell`.
 1. If an introduction dialog displays, click through it.
-1. You'll be taken to a command prompt that already has the proper command to connect to the instance. 
-Just press "Return".
+1. You'll be taken to a command prompt that already has the proper command to connect to the instance.
+Just press `Return`.
 1. Wait for your shell to be whitelisted.
+1. Enter the root password you sent when you created the instance.
 1. Run `CREATE DATABASE servicebroker;`
-1. Run `CREATE USER '<username>'@'%' IDENTIFIED BY '<password>';`. Be sure to remember the username and password!
-1. Run `GRANT ALL PRIVILEGES ON servicebroker.* TO '<username>'@'%' WITH GRANT OPTION;`
-1. Exit from the shell.
+1. Run `CREATE USER '<username>'@'%' IDENTIFIED BY '<password>';` replacing `<username>` and `<password>` with values you select. Be sure to remember the username and password!
+1. Run `GRANT ALL PRIVILEGES ON servicebroker.* TO '<username>'@'%' WITH GRANT OPTION;` replacing `<username>` with the value from the above command.
+1. Exit from the MySQL client and cloud shell by typing `exit` and hitting `<ENTER>` twice.
 
-<a name="cloud-foundry-setup"></a>
-## Cloud Foundry Setup
-With the GCP setup complete, we now direct our attention to setting up the Service Broker within Cloud Foundry. For 
-this tutorial that involves deploying the GCP Service Broker as an application and then registering that application as a
-Service Broker with Cloud Foundry. 
-<a name="deploy-app"></a>
+### GCP Setup Recap
 
-### Service Broker Application Deployment and Registration
+Before we continue, let's be sure we understand what we have done so far. The service broker is going to leverage Google Cloud APIs to provision and manipulate resources in our project. As our broker performs work, it will store the state of the resources it has provisioned in a MySQL database.
 
-The first step to setting up the Cloud Foundry portions is to deploy the  Service Broker as an application.
-This involves cloning the github repository where the source of the broker resides, modifying the manifest.yml with information
-corresponding to your GCP project, and then pushing the application to CF.
+So far, we have:
+* created a project
+* enabled APIs our broker will use
+* provisioned a MySQL database for the broker to store state and configured the database so the broker will be able to connect
+
+Now, we can deploy the broker and use it.
+
+## Deploying the Broker
+
+We will now deploy the GCP service broker as an application to Cloud Foundry. We will then register this application as a service broker. Before continuing, be sure you are logged into a Cloud Foundry instance and targeted to an org and space
+
+### Cloning
+
+We will start by cloning the latest broker source from github. If you don't have git installed, you can also download a zip file of the broker source.
+
+**Option 1: Cloning**
+
+If you are a git user, you can clone the repository and change to it.
 
   ```
   $ git clone https://github.com/GoogleCloudPlatform/gcp-service-broker.git
   $ cd gcp-service-broker
   ```
 
-Add these to the `env` section of `manifest.yml`
+**Option 2: Downloading a Zip**
 
-* `ROOT_SERVICE_ACCOUNT_JSON` - the string version of the credentials file created for the Owner level Service Account.
-* `SECURITY_USER_NAME` - the username to authenticate broker requests - this will be used in the `cf create-service-broker` below.
-* `SECURITY_USER_PASSWORD` - the password to authenticate broker requests - this will be used in the `cf create-service-broker` below.
-* `DB_HOST` - the host for the database to back the service broker.
-* `DB_USERNAME` - the database username for the service broker to use.
-* `DB_PASSWORD` - the database password for the service broker to use.
+If you are not a git user, you can download a zip of the repository.
 
-Now that the `manifest.yml` is ready, it is time to push the application to Cloud Foundry and register it as a 
-Service Broker.
+  * Download the zip: https://github.com/GoogleCloudPlatform/gcp-service-broker/archive/master.zip
+  * Unzip the downloaded file
+  * In a terminal window, change to the unzipped directory.
 
-* Deploy the Service Broker Application to Cloud Foundry.
+### Configuring
 
-  ```
-  $ cf p  # Take note of the URL. It is used in the next command.
-  ```
- 
-  If everything is successful you should see output similar to:
- 
-  ```
-  name:              gcp-service-broker
-  requested state:   started
-  routes:            gcp-service-broker.cfapps.io
-  last uploaded:     Wed 23 Jan 07:46:57 MST 2019
-  stack:             cflinuxfs2
-  buildpacks:        go
-   
-  type:            web
-  instances:       1/1
-  memory usage:    1024M
-  start command:   gcp-service-broker
-       state     since                  cpu    memory    disk      details
-  #0   running   2019-01-23T14:47:15Z   0.0%   0 of 1G   0 of 1G   
-  ```
+Configuration of the broker is done via environment variables. We can set these values in the manifest. However, the values are sensitive. Typically, manifests are checked into source control and therefore we need to keep our secrets elsewhere.  For this, we will create a separate secrets file and reference the values in the manifest.
 
-* Register the above application as a service broker with Cloud Foundry.
-   
-  ```
-  $ cf create-service-broker gcp-spanner-service-broker <username> <password> <service broker app url> --space-scoped
-  ```
-  
-  If everything is successful you should see output similar to:
-  
-  ```
-  Creating service broker gcp-spanner-service-broker in org 18f / space development as steve.wall@primetimesoftware.com...
-  OK
-  ```
-
-<a name="check-create-service-broker"></a>
-#### Check Your Work
-Once the broker is installed, the services will be available in the marketplace. Use `cf marketplace` to list the 
-services in the marketplace. Executing the marketplace command should show the GCP services are now available. 
-There are a large number of available services. For the sake of brevity, ellipses are used to demonstrate a large list.
-
+* Using your favorite text editor, open the `manifest.yml`. Add the following under the `env` section of the manifest after the existing values (you can ignore the comment about not editing this file):
 
   ```
-  ...
-    
-  google-bigquery                 default    A fast, economical and fully managed data warehouse for large-scale data analytics.
-    
-  ...
-    
-  google-spanner                  sandbox, minimal-production
-    
-  ...
+      ROOT_SERVICE_ACCOUNT_JSON: ((root-service-account-json))
+      SECURITY_USER_NAME: ((security-user-name))
+      SECURITY_USER_PASSWORD: ((security-user-password))
+      DB_HOST: ((db-host))
+      DB_USERNAME: ((db-username))
+      DB_PASSWORD: ((db-password))
   ```
 
-Then we exercise the service broker by create a GCP Spanner service and deploying the `trades` example application that 
-uses the service.
+  The values inside the `(())` will be stored in a separate file. This ensures our manifest is safe to commit to version control without leaking secrets.
 
-<a name="create-spanner-service"></a>
-### Create a Spanner Service
-
-* Create the Spanner service that will be used by the `trades` application.
+* Now in your favorite text editor, create a file to hold these secrets called `secrets.yml`. Paste the following into the file:
 
   ```
-  $ cf create-service google-spanner sandbox trades-spanner -c '{"name":"auth-database"}'
-  ```
-  
-  If everything is successful you should see output similar to:
-  
-  ```
-  Creating service instance trades-spanner in org 18f / space development as steve.wall@primetimesoftware.com...
-  OK
-  
-  Create in progress. Use 'cf services' or 'cf service trades-spanner' to check operation status.
-  
-  Attention: The plan `sandbox` of service `google-spanner` is not free.  The instance `trades-spanner` will incur a cost.  Contact your administrator if you think this is in error.
+  root-service-account-json:
+  security-user-name:
+  security-user-password:
+  db-host:
+  db-username:
+  db-password:
   ```
 
-<a name="check-spanner-service"></a>
-#### Check Your Work
-Once the service has been create, executing the `cf services` command shows it as an available service in the space.
+  Set the following values:
 
-```$ cf services
-Getting services in org 18f / space development as steve.wall@primetimesoftware.com...
+  * `root-service-account-json`: Open the key file which was downloaded to your computer in the "Create Root Service Account" section above. Copy the entire contents and past it as the value inside single quotes.
 
-name             service                 plan                bound apps           last operation
-trades-spanner   google-spanner          sandbox             trades               create succeeded
+  * `security-user-name`: This is the username used by the broker to authenticate requests. It will be used when you register the broker with Cloud Foundry below. You can set this to anything you want.
+
+  * `security-user-password`: This is the password used by the broker to authenticate requests. It will be used when you register the broker with Cloud Foundry below. You can set this to anything you want. If you have special characters in the password, you should place the value inside of double quotes.
+
+  * `db-host`: Set this to the public IP address of the MySQL database you created above. You can find this in the GCP console on the instance details page for your database.
+
+  * `db-username`: Set this to the `<username>` you provided in the [Create Database and User](#create-database-and-user) section above.
+
+  * `db-password`:  Set this to the `<password>` you provided in the [Create Database and User](#create-database-and-user) section above. If you have special characters in the password, you should place the value inside of double quotes.
+
+* Save the `secrets.yml` file. You need to ensure this file IS NOT checked into source control. If you are using git, you should add an entry to your [.gitignore](https://git-scm.com/docs/gitignore) file.
+
+#### Checking Your Configuration
+
+Your manifest should look similar to (values above the properties you added to the `env` section may vary):
+
+```
+# Copyright the Service Broker Project Authors. All rights reserved.
+... cut for brevity...
+# This file is AUTOGENERATED by ./gcp-service-broker generate, DO NOT EDIT IT.
+
+---
+applications:
+  - name: gcp-service-broker
+    product_version: "4.2.0"
+    metadata_version: "1.0"
+    label: 'GCP Service Broker'
+    description: 'A service broker for Google Cloud Platform services.'
+    memory: 1G
+    buildpack: go_buildpack
+    env:
+      GOPACKAGENAME: github.com/GoogleCloudPlatform/gcp-service-broker
+      GOVERSION: go1.10
+      ROOT_SERVICE_ACCOUNT_JSON: ((root-service-account-json))
+      SECURITY_USER_NAME: ((security-user-name))
+      SECURITY_USER_PASSWORD: ((security-user-password))
+      DB_HOST: ((db-host))
+      DB_USERNAME: ((db-username))
+      DB_PASSWORD: ((db-password))
 ```
 
-<a name="deploy-spanner-app"><a>
-### Deploy Spanner Application
+You should have a `secrets.yml` file that looks similar to the following (note that we changed sensitive information):
 
-Now it is time to deploy an application to use the Spanner service. The first step is to copy the example application 
-and associated manifest.yml. For this, you will use the 
-[Trades](https://github.com/primetimesoftware/trades) example Spanner applications.
+```
+root-service-account-json: '{
+  "type": "service_account",
+  "project_id": "someproject",
+  "private_key_id": "REMOVEDSOMESTUFFHEREFORSAFETYANDSANITY",
+  "private_key": "-----BEGIN PRIVATE KEY-----\LETSMESSTHISVALUEUPTOINTHENAMEOFSAFETYANDSECURITYLETSMESSTHISVALUEUPTOINTHENAMEOFSAFETYANDSECURITY...REMOVED...\n-----END PRIVATE KEY-----\n",
+  "client_email": "something@some-project.iam.gserviceaccount.com",
+  "client_id": "8675309867530986753098675309",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/something%40someproject.iam.gserviceaccount.com"
+}'
+security-user-name: broker-user
+security-user-password: broker-pwd
+db-host: 8.67.53.09
+db-username: db-user
+db-password: db-pwd
+```
 
-Navigate to the [Trades release page](https://github.com/primetimesoftware/trades/releases) and download the latest 
-trades.zip release.
+### Pushing
 
-Create a working directory, copy the trades.zip to the directory, and expand the zip file. For example:
+Now that the manifest and secrets are ready, it is time to push the application to Cloud Foundry.
+
+* From inside the broker source directory (same directory as your manifest):
+
+  ```
+  $ cf push --vars-file secrets.yml
+  ```
+
+  > NOTE: You may have to add the `--hostname` flag and specify a unique hostname to avoid route collisions.
+
+If everything is successful you should see output similar to:
+
+  ```
+  Waiting for app to start...
+
+  name:              gcp-service-broker
+  requested state:   started
+  routes:            gcp-service-broker.app.cloud.gov
+  last uploaded:     Wed 23 Jan 17:29:21 MST 2019
+  stack:             cflinuxfs2
+  buildpacks:        go
+
+  type:            web
+  instances:       1/1
+  memory usage:    1G
+  start command:   gcp-service-broker
+       state     since                  cpu    memory        disk           details
+  #0   running   2019-01-24T00:29:41Z   0.0%   44K of 1G   130.4M of 1G   
+  ```
+
+Make note of the route assigned to the app. You will need it in the next step.
+
+### Registering
+
+Now that our broker is available as an app, we can register it with Cloud Foundry.
+
+* Register your broker using `cf create-service-broker`:
+
+  ```
+  $ cf create-service-broker gcp-service-broker <username> <password> https://<route> --space-scoped
+  ```
+
+  Be sure to provide the correct values for:
+
+  * `<username>`: This should be the same value as you provided in `secrets.yml` for the `security-user-name` property.
+  * `<password>`: This should be the same value as you provided in `secrets.yml` for the `security-user-password` property.
+  * `<route>`: This is the route assigned to your service broker application above.
+
+If everything is successful you should see output similar to:
+
+  ```
+  Creating service broker gcp-service-broker in org 18f / space development as someuser@cloug.gov...
+  OK
+  ```
+
+### The Marketplace
+
+Once the broker is registered, the services offerings will be available in the marketplace.
+
+  * Use `cf marketplace` to list the service offerings. You will see a large number of service offerings prefixed by `google-` which are advertised by the broker.
+
+> NOTE: We only enabled the GCP APIs for Google Spanner. Therefore, trying to provision a different service will result in an error. You can learn about enabling additional services in the broker repository: https://github.com/GoogleCloudPlatform/gcp-service-broker.
+
+## Using Spanner with a Sample Application
+
+At this point, the broker is ready to provision Spanner instances. We have included a sample application that uses Spanner to test this.
+
+### Deploying the Trades Application
+
+The Trades application demonstrates how to read and write POJOs from Google Cloud Spanner using the Spring. We can use it to test our GCP broker.
+
+* Download the latest `trades.zip` release: https://github.com/primetimesoftware/trades/releases/download/latest/trades.zip
+
+* Create a working directory, copy the trades.zip to the directory, and expand the zip file. For example:
 
   ```
   $ mkdir trades-working
@@ -266,220 +339,122 @@ Create a working directory, copy the trades.zip to the directory, and expand the
   $ unzip trades.zip
   ```
 
-The next step is to deploy the application. Do not start the application yet. You'll need to bind the service to the 
-application and then it'll be ready to start.
+* Deploy the application without starting it:
 
-```
-$ `cf p --no-start`
-```
+  ```
+  $ cf push --no-start
+  ```
 
-  If everything is successful you should see output similar to:
-  
-```
-name:              trades
-requested state:   stopped
-routes:            trades-daring-platypus.cfapps.io
-last uploaded:     
-stack:             
-buildpacks:        
+  > NOTE: You may need to use `--random-route` or specify a hostname via `--hostname` to avoid route collisions.
 
-type:           web
-instances:      0/1
-memory usage:   1024M
-     state   since                  cpu    memory   disk     details
-#0   down    2019-01-23T15:40:45Z   0.0%   0 of 0   0 of 0   
-```
+### Creating and Binding
 
-The Trades application uses a `random-route` when deploying the application. Take note of the application url.
+* Create the Spanner service instance that will be used by the `trades` application:
 
-> Note: We are using `random-route` to help prevent route collisions.  You should not use this feature except in development, 
-training or CI/CD scenarios such as this. We do not recommend using `random-route` in production.
+  ```
+  $ cf create-service google-spanner sandbox trades-spanner -c '{"name":"auth-database"}'
+  ```
 
-Now you are ready to bind the service to the application. Binding the service adds the required connection information 
-to the application `VCAP_SERVICES` environment variable.
+* Bind the instance to the trades app:
 
-```
-$ `cf bs trades trades-spanner -c '{"role":"spanner.databaseAdmin"}'`
-```
+  ```
+  $ cf bs trades trades-spanner -c '{"role":"spanner.databaseAdmin"}'
+  ```
 
-  If everything is successful you should see output similar to:
+### Accessing the Trades App
 
-```
-Binding service trades-spanner to app trades in org 18f / space development as steve.wall@primetimesoftware.com...
-OK
-TIP: Use 'cf restage trades' to ensure your env variable changes take effect
-```
+You can now start the trades app and see it serving content it placed in Spanner.
 
-<a name="check-bind-service></a>
-#### Check your work
+* Start the trades app:
 
-To verify your work use the `cf env trades` command. If the service is properly bound, you'll see a `google-spanner` 
-section in the `VCAP_SERVICES` environment variable.
+  ```
+  $ cf start trades
+  ```
 
-```
-Getting env variables for app trades-lemur in org 18f / space development as steve.wall@primetimesoftware.com...
-OK
+* Access the `trades` endpoint from a browser at: https://<trades-route>/trades. You should see a json reponse similar to:
 
-System-Provided:
-{
- "VCAP_SERVICES": {
-  "google-spanner": [
-   {
-    "binding_name": null,
-    "credentials": {
-     "Email": "pcf-binding-debc921f@microp.iam.gserviceaccount.com",
-     "Name": "pcf-binding-debc921f",
-     "PrivateKeyData": "a really long private key",
-     "ProjectId": "microp",
-     "UniqueId": "112542272797442861821",
-     "instance_id": "auth-database"
+  ```
+  {
+    "_embedded" : {
+      "trades" : [ {
+        "tradesId" : "demo_trades1",
+        "firstName" : "John",
+        "lastName" : "Doe",
+        "_links" : {
+          "self" : {
+            "href" : "https://trades-lemur.cfapps.io/trades/demo_trades1"
+          },
+          "trades" : {
+            "href" : "https://trades-lemur.cfapps.io/trades/demo_trades1"
+          }
+        }
+      }, {
+        "tradesId" : "demo_trades2",
+        "firstName" : "Mary",
+        "lastName" : "Jane",
+        "_links" : {
+          "self" : {
+            "href" : "https://trades-lemur.cfapps.io/trades/demo_trades2"
+          },
+          "trades" : {
+            "href" : "https://trades-lemur.cfapps.io/trades/demo_trades2"
+          }
+        }
+      }, {
+        "tradesId" : "demo_trades3",
+        "firstName" : "Scott",
+        "lastName" : "Smith",
+        "_links" : {
+          "self" : {
+            "href" : "https://trades-lemur.cfapps.io/trades/demo_trades3"
+          },
+          "trades" : {
+            "href" : "https://trades-lemur.cfapps.io/trades/demo_trades3"
+          }
+        }
+      } ]
     },
-    "instance_name": "gcpspanner",
-    "label": "google-spanner",
-    "name": "gcpspanner",
-    "plan": "sandbox",
-    "provider": null,
-    "syslog_drain_url": null,
-    "tags": [
-     "gcp",
-     "spanner"
-    ],
-    "volume_mounts": []
-   }
-  ]
- }
-}
-```
-
-Once the service is successfully bound, it is time to start the application.
-
-```
-$ `cf start trades`
-```
-
-  If everything is successful you should see output similar to:
-
-```
-name:              trades
-requested state:   started
-routes:            trades-daring-platypus.cfapps.io
-last uploaded:     Wed 23 Jan 08:46:03 MST 2019
-stack:             cflinuxfs2
-buildpacks:        client-certificate-mapper=1.8.0_RELEASE container-security-provider=1.16.0_RELEASE
-                   java-buildpack=v4.17.1-offline-https://github.com/cloudfoundry/java-buildpack.git#47e68da
-                   java-main java-opts java-security jvmkill-agent=1.16.0_RELEASE open-jd...
-
-type:            web
-instances:       1/1
-memory usage:    1024M
-start command:   JAVA_OPTS="-agentpath:$PWD/.java-buildpack/open_jdk_jre/bin/jvmkill-1.16.0_RELEASE=printHeapHistogram=1
-                 -Djava.io.tmpdir=$TMPDIR -XX:ActiveProcessorCount=$(nproc)
-                 -Djava.ext.dirs=$PWD/.java-buildpack/container_security_provider:$PWD/.java-buildpack/open_jdk_jre/lib/ext
-                 -Djava.security.properties=$PWD/.java-buildpack/java_security/java.security $JAVA_OPTS" &&
-                 CALCULATED_MEMORY=$($PWD/.java-buildpack/open_jdk_jre/bin/java-buildpack-memory-calculator-3.13.0_RELEASE
-                 -totMemory=$MEMORY_LIMIT -loadedClasses=17853 -poolType=metaspace -stackThreads=250
-                 -vmOptions="$JAVA_OPTS") && echo JVM Memory Configuration: $CALCULATED_MEMORY && JAVA_OPTS="$JAVA_OPTS
-                 $CALCULATED_MEMORY" && MALLOC_ARENA_MAX=2 SERVER_PORT=$PORT eval exec
-                 $PWD/.java-buildpack/open_jdk_jre/bin/java $JAVA_OPTS -cp $PWD/.
-                 org.springframework.boot.loader.JarLauncher
-     state     since                  cpu      memory         disk           details
-#0   running   2019-01-23T15:46:36Z   151.8%   192.5M of 1G   163.5M of 1G   
-```
-<a name="check-trades-app-deploy"></a>
-#### Checking your work
-To check the application deployed correctly, access the `trades` endpoint from a browser.
-
-https://<app url>/trades
-
-This should return the following json document.
-
-```
-{
-  "_embedded" : {
-    "trades" : [ {
-      "tradesId" : "demo_trades1",
-      "firstName" : "John",
-      "lastName" : "Doe",
-      "_links" : {
-        "self" : {
-          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades1"
-        },
-        "trades" : {
-          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades1"
-        }
+    "_links" : {
+      "self" : {
+        "href" : "https://trades-lemur.cfapps.io/trades{?page,size,sort}",
+        "templated" : true
+      },
+      "profile" : {
+        "href" : "https://trades-lemur.cfapps.io/profile/trades"
       }
-    }, {
-      "tradesId" : "demo_trades2",
-      "firstName" : "Mary",
-      "lastName" : "Jane",
-      "_links" : {
-        "self" : {
-          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades2"
-        },
-        "trades" : {
-          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades2"
-        }
-      }
-    }, {
-      "tradesId" : "demo_trades3",
-      "firstName" : "Scott",
-      "lastName" : "Smith",
-      "_links" : {
-        "self" : {
-          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades3"
-        },
-        "trades" : {
-          "href" : "https://trades-lemur.cfapps.io/trades/demo_trades3"
-        }
-      }
-    } ]
-  },
-  "_links" : {
-    "self" : {
-      "href" : "https://trades-lemur.cfapps.io/trades{?page,size,sort}",
-      "templated" : true
     },
-    "profile" : {
-      "href" : "https://trades-lemur.cfapps.io/profile/trades"
+    "page" : {
+      "size" : 20,
+      "totalElements" : 3,
+      "totalPages" : 1,
+      "number" : 0
     }
-  },
-  "page" : {
-    "size" : 20,
-    "totalElements" : 3,
-    "totalPages" : 1,
-    "number" : 0
   }
-}
-```
+  ```
 
-<a name="cleanup"></a>
-## Cleanup
+The trades app is adding entries to Spanner and serving results from it.
 
-Through the course of the tutorial, there were several things created in your CF space. We don't have to leave things
-hanging around consuming resources, so now it's time to cleanup! This essentially involves deleting the items that were
-created in reverse order.
+
+## Conclusion
+
+Congratulations on finishing the tutorial! You should have a functional GCP broker configured to work with Spanner. As we mentioned above, you can find more information on configuring additional GCP APIs here: https://github.com/GoogleCloudPlatform/gcp-service-broker.
+
+### Cleaning Up
+
+If you would like to clean up everything created in this tutorial, you can do the following:
 
 * Delete the Trades application.
 
-$ `cf d trades`
+$ `cf delete -f -r trades`
 
 * Delete the service instance.
 
-$ `cf ds trades-spanner`
+$ `cf delete-service -f trades-spanner`
 
 * Delete the service broker.
 
-$ `cf delete-service-broker gcp-spanner-service-broker`
+$ `cf delete-service-broker gcp-service-broker`
 
 * Delete the GCP Service Broker application.
 
-$ `cf d gcp-service-broker`
-
-<b>Checking your work</b>
-
-Running `cf a` should show the Trades and GCP Service Broker applications are
-no longer deployed.
-
-Running `cf s` should show the service no longer exists.
-
-Running `cf service-brokers` should show the service broker no longer exists.
+$ `cf delete -f -r gcp-service-broker`
