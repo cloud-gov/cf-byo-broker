@@ -458,3 +458,5 @@ $ `cf delete-service-broker -f gcp-service-broker`
 * Delete the GCP Service Broker application.
 
 $ `cf delete -f -r gcp-service-broker`
+
+* You can also delete your GCP project via the console by going to the project settings and selecting `Shut Down`.
