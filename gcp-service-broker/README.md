@@ -453,7 +453,7 @@ $ `cf delete-service -f trades-spanner`
 
 * Delete the service broker.
 
-$ `cf delete-service-broker gcp-service-broker`
+$ `cf delete-service-broker -f gcp-service-broker`
 
 * Delete the GCP Service Broker application.
 
