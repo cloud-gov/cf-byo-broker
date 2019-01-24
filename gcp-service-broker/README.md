@@ -33,7 +33,7 @@ In order to complete the tutorial, please be sure you have:
 
 * A [Google Cloud Platform (GCP) account](https://accounts.google.com/).
 * A working knowledge of Cloud Foundry with experience using the [CLI](https://docs.cloudfoundry.org/cf-cli/).
-* A working knowledge of space-scoped service brokers. For an  introduction, see the [Simple Service Broker Tutorial](/cg-customer-broker/tree/master/simple-service-broker).
+* A working knowledge of space-scoped service brokers. For an  introduction, see the [Simple Service Broker Tutorial](../simple-service-broker).
 * A Cloud Foundry account and a space to deploy apps.  You need the `SpaceDeveloper` role in the space.
 
 ## GCP Setup
