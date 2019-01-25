@@ -33,7 +33,7 @@ In order to complete the tutorial, please be sure you have:
 
 * A [Google Cloud Platform (GCP) account](https://accounts.google.com/).
 * A working knowledge of Cloud Foundry with experience using the [CLI](https://docs.cloudfoundry.org/cf-cli/).
-* A working knowledge of space-scoped service brokers. For an  introduction, see the [Simple Service Broker Tutorial](/cg-customer-broker/tree/master/simple-service-broker).
+* A working knowledge of space-scoped service brokers. For an  introduction, see the [Simple Service Broker Tutorial](../simple-service-broker).
 * A Cloud Foundry account and a space to deploy apps.  You need the `SpaceDeveloper` role in the space.
 
 ## GCP Setup
@@ -333,7 +333,6 @@ The Trades application demonstrates how to read and write POJOs from Google Clou
 * Unzip the trades.zip, change to the trades directory in preparation for deploying the application.
 
   ```
-  $ cp ~/Downloads/trades.zip
   $ unzip trades.zip
   $ cd trades
   ```
@@ -341,7 +340,7 @@ The Trades application demonstrates how to read and write POJOs from Google Clou
 * Deploy the application without starting it:
 
   ```
-  $ cf push -p trades*.zip --no-start
+  $ cf push -p trades*.jar --no-start
   ```
 
   > NOTE: You may need to use `--random-route` or specify a hostname via `--hostname` to avoid route collisions.
