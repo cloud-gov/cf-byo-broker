@@ -17,6 +17,7 @@ In this tutorial, we will show you how to deploy a simple service broker to a sp
   * [Using the Same Broker in Another Space](#using-the-same-broker-in-another-space)
   * [Purging Service Instances](#purging-service-instances)
   * [Purging Service Offerings](#purging-service-offerings)
+* [Updating a Broker](#updating-a-broker)
 * [Deleting the Broker](#deleting-the-broker)
 * [Beyond the Tutorial](#beyond-the-tutorial)
 
@@ -406,6 +407,18 @@ As the warning in the CLI states:
   ```
 
 If you re-run `cf marketplace` and `cf services` you will see all of the `simple-service` records are gone.
+
+## Updating a Broker
+
+What happens if we release a new version of the simple service broker? What should you do to update the broker in your space?
+
+Remember that the broker is simply an application. From Cloud Foundry's perspective, the broker is just an endpoint - a url and some credentials. Therefore, you only need to push the updated app. You don't need to re-run `create-service-broker` or do anything with your existing service instances.
+
+Here are some things to consider when managing broker instances:
+
+* We recommend updating any Cloud Foundry app using either a [blue/green deployment](https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html) or the new [zero downtime](https://docs.cloudfoundry.org/devguide/deploy-apps/zero-downtime.html) capability currently in beta.
+* The broker is only involved in provisioning/de-provisioning and binding/unbinding. It is not involved when an application interacts with the service instance. Therefore, if you chose to simply push new changes, there is a fairly low risk of an interruption during the push. Users will simply not be able to provision or bind.
+* Updates assume the broker has been authored and tested to not introduce breaking changes. You should always test new versions in a non-production environment before incorporating them into production workflows.
 
 
 ## Deleting the Broker
