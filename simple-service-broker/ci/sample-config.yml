@@ -9,6 +9,14 @@ cf_user:
 cf_password:
 cf_org:
 cf_space:
+cf_another_space:
 
 broker_username:
 broker_password:
+
+github_username:
+github_password:
+
+artifact_bucket:
+aws_access_key_id:
+aws_secret_access_key:
