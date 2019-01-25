@@ -1,5 +1,9 @@
 #!/bin/bash
-
+###################################################################################
+#
+#  This script deploys the GCP Service Broker as an application to Cloud Foundry.
+#
+###################################################################################
 set -x
 set -e
 
@@ -30,4 +34,5 @@ applications:
 
 EOF
 
-cf p
+# push the GCP Service Broker application with a random route to avoid route collisions.
+cf p --random-route
