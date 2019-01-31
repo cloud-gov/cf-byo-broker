@@ -27,6 +27,7 @@ In order to complete the tutorial, please be sure you have:
 
 * A working knowledge of Cloud Foundry with experience using the [CLI](https://docs.cloudfoundry.org/cf-cli/). You should have familiarity with pushing apps and creating/binding service instances.
 * A Cloud Foundry account and a space to deploy apps.  You need the `SpaceDeveloper` role in the space. You will only need 128M of memory available.
+* You do not need any additional IaaS resources (such as Azure or GCP)
 
 Before you begin, please be sure you are logged into a Cloud Foundry instance and targeted to an org and space.
 
