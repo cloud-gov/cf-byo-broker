@@ -145,7 +145,7 @@ Currently, Cloud Foundry has a limitation whereby the name of a space-scoped ser
 * Use the `create-service-broker` command to register your broker with Cloud Foundry.
 
   ```
-  $ cf create-service-broker simple-service-broker-<YOUR_ORG>-<YOUR_SPACE> admin secret https://<YOUR-BROKER-ROUTE> --space-scoped
+  $ cf create-service-broker --space-scoped simple-service-broker-<YOUR_ORG>-<YOUR_SPACE> admin secret https://<YOUR-BROKER-ROUTE> 
   ```
 
   You should see output similar to:
