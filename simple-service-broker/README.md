@@ -227,7 +227,7 @@ Because of the limitation on broker names documented [above](#space-scoped-broke
 * Register the same service broker using a different name (but the same username, password and URL)
 
   ```
-  $ cf create-service-broker simple-service-broker-<YOUR_ORG>-<YOUR_SPACE> admin secret https://<YOUR-BROKER-ROUTE> --space-scoped
+  $ cf create-service-broker --space-scoped simple-service-broker-<YOUR_ORG>-<YOUR_SPACE> admin secret https://<YOUR-BROKER-ROUTE>
   ```
 
 You should now have access to the broker in this space.
