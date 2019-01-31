@@ -402,7 +402,6 @@ As the warning in the CLI states:
   You will see output similar to:
 
   ```
-  $ cf purge-service-offering -f simple-service
   Purging service simple-service...
   OK
   ```
