@@ -32,7 +32,7 @@ Before you begin, please be sure you are logged into a Cloud Foundry instance an
 
 ## What is a Service Broker?
 
-A service broker is an application that implements a standard API, the [Open Service Broker API](https://www.openservicebrokerapi.org/). Service brokers hide the complexity of provisioning and configuring the underlying service behind a standard API. In Cloud Foundry terms, this means you can do things like create a database using a standard command `cf create-service`, rather than needing to know how to install and configure the database.
+A service broker is an application that implements a standard API, the [Open Service Broker API](https://www.openservicebrokerapi.org/). Service brokers hide the complexity of provisioning and configuring the underlying service behind a standard API. In Cloud Foundry terms, this means you can do things like create a database using a standard command `cf create-service`, rather than needing to know how to install and configure the database. And because the API is an industry standard, it can be used in platforms other than Cloud Foundry including Kubernetes.
 
 Service brokers are behind all of the services listed in the marketplace. In this tutorial, we will show you how add your own service broker to the marketplace. The services you see in the marketplace now are likely installed and configured by the administrators of your Cloud Foundry. However, if you are SpaceDeveloper, you can bring your own space-scoped broker. This tutorial will show you how to do this.
 
