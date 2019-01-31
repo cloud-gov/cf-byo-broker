@@ -212,7 +212,7 @@ At this point, you should be able to create and bind service instances as with a
 
 ### Using the Same Broker in Another Space
 
-You can use the same broker in another space without redeploying it. You can simply register the same broker in another space using `cf create-service-broker`.
+You can use the same broker in another space without redeploying it. You can simply register the same broker in another space using `cf create-service-broker`. The space does not need to be in the same org.
 
 Because of the limitation on broker names documented [above](#space-scoped-broker-names), you will need to provide a unique name to the `cf create-service-broker` command. However, if you follow the recommended workaround of adding the org and space, it should all work for you.
 
