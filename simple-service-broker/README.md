@@ -157,11 +157,11 @@ Currently, Cloud Foundry has a limitation whereby the name of a space-scoped ser
 
 Let's break down the command:
 
+  * `--space-scoped`: This tells Cloud Foundry to register the broker only within your space. This allows you to add any broker to your space.
   * `simple-service-broker-<YOUR_ORG>-<YOUR_SPACE>`: This is the name of the broker as referenced within Cloud Foundry. While this matches our app name, there is no relationship between the two values. Using the same name simply makes it easier for humans to reason over the relationship.
   * `admin` and `secret` are the `USERNAME` & `PASSWORD` for the service broker. Providing these allows Cloud Foundry to authenticate to the broker.
   * `https://<YOUR-BROKER-ROUTE>`: This is the route of your broker prefixed with `https://`.
-  * `--space-scoped`: This tells Cloud Foundry to register the broker only within your space. This allows you to add any broker to your space.
-
+ 
 #### Checking Your Work
 
 At this point, your broker should be registered with Cloud Foundry.  You can check this by running via the `cf service-brokers` command.  You should see output similar to:
