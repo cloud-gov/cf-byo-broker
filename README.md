@@ -1,4 +1,4 @@
-# cf-byob
+# cf-byo-broker
 
 This repository houses tutorials showing users how to bring their own service brokers to use in their spaces in Cloud Foundry. This effort was [funded by the cloud.gov team at 18F](https://github.com/18F/cg-product/issues/876), though the content should be applicable to any Cloud Foundry deployment.  
 
