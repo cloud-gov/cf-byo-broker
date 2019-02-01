@@ -1,6 +1,6 @@
-# cg-customer-broker
+# cf-byob
 
-This repository houses tutorials showing users how to bring their own service brokers to spaces in Cloud Foundry. The effort was funded by the 18f team at cloud.gov.  
+This repository houses tutorials showing users how to bring their own service brokers to use in their spaces in Cloud Foundry. This effort was [funded by the cloud.gov team at 18F](https://github.com/18F/cg-product/issues/876), though the content should be applicable to any Cloud Foundry deployment.  
 
 * [Simple Service Broker Tutorial](simple-service-broker): We recommend you start here. In this tutorial, we will show you how to deploy a simple service broker to a space in Cloud Foundry and make it available for use via the marketplace. We also show you how to interact with the broker and clean up when things go wrong.
 
