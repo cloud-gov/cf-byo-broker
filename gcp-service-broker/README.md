@@ -98,7 +98,7 @@ The GCP service broker stores the state of provisioned resources in a MySQL data
 
 #### Allow Database Access
 
-By default the database cannot be accessed from external IPs. Since our broker will be running Cloud Foundry, we need to allow access. These next steps open the database to external access.
+By default the database cannot be accessed from external IPs. Since our broker will be running in Cloud Foundry, we need to allow access to the database from that Cloud Foundry. These next steps open the database to external access.
 
 1. Select the newly created instance from the list, which brings you to the `Instance details`.
 1. Select the `Connections` tab.
@@ -326,7 +326,7 @@ At this point, the broker is ready to provision Spanner instances. We have inclu
 
 ### Deploying the Trades Application
 
-The Trades application demonstrates how to read and write POJOs from Google Cloud Spanner using the Spring. We can use it to test our GCP broker.
+The Trades application demonstrates how to read and write POJOs from Google Cloud Spanner using the Spring framework. We can use it to test our GCP broker.
 
 * Download the latest `trades.zip` release: https://github.com/primetimesoftware/trades/releases/download/latest/trades.zip
 
