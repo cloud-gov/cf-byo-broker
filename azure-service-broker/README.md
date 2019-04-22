@@ -56,10 +56,10 @@ First let's identify your Azure subscription and save it for use later on in the
 
 ### Create a Resource Group
 
-When you create an AKS cluster, you must provide a resource group. Create one with the az cli using the following command.
+sCreate one with the az cli using the following command.
 
 ```console
-az group create --name <RG> --location eastus
+az group create --name <CHANGEME> --location eastus
 ```
 
 ### Create a service principal
@@ -197,5 +197,13 @@ Now that our broker is available as an app, we can register it with Cloud Foundr
   $ cf csb open-service-broker-azure  <username> <password> https://<route> --space-scoped
   ```
 
-### Automating Deployment with `terraform`
+### Marketplace
+
+![alt text](../.media/marketplace.png)
+
+### Automating Deployment with `terraform` AzureRM Provider
+
+### Automating Deployment with Concourse.ci Pipeline(s)
+
+
 
