@@ -1,7 +1,6 @@
 # Open Service Broker™ for Azure on Cloud Foundry
 
-
-This tutorial walks us through how to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry. We also illustrate leveraging `terraform` and concourse.ci pipelines, providing creation of the Azure service broker both manually and programmatically.
+This tutorial walks us through how to steps required to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry. We will also illustrate leveraging `terraform` and Concourse.ci pipelines, outlining creation of the Azure service broker both manually and programmatically.
 
 **Table of Contents**
 
@@ -15,8 +14,9 @@ This tutorial walks us through how to deploy the Azure open service broker (OSBA
     * [Configuring](#configuring)
     * [Pushing]()
     * [Registering]()
-        * [The Marketplace]()
-    * [Automating Deployment via Terraform]()
+        * [Viewing the Marketplace](#viewing-the-marketplace)
+    * [Automating Deployment with Concourse.ci](#automation)
+        * [We Assume](#we-assume)
     
 
 ## Prerequisites
@@ -25,27 +25,16 @@ In order to complete the tutorial, please be sure you have:
 
 * A [Microsoft Azure account](https://portal.azure.com).
 * A working knowledge of **Azure [CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)** or use of the [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview?view=azure-cli-latest)
-    * Optionally, you use the official `azure-cli` docker container
+    * _Optionally, you use the official [`azure-cli`](https://hub.docker.com/r/microsoft/azure-cli/dockerfile) container_
 * A working knowledge of **Cloud Foundry** with experience using the [CLI](https://docs.cloudfoundry.org/cf-cli/).
 * A working knowledge of space-scoped service brokers. For an  introduction, see the [Simple Service Broker Quickstart Tutorial](../simple-service-broker).
-* A working knowledge of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/).
 * A Cloud Foundry account and a space to deploy apps.
 
 ## Azure Setup
 
-Optionally having working knowledge of Docker, you can also use the official [`azure-cli`](https://hub.docker.com/r/microsoft/azure-cli/dockerfile) container
-
-```sh
-docker run -it --rm \
-        -v $(pwd):/root/.kube \
-        microsoft/azure-cli:<version>
-```
-_**└──**_ _$ terminal_
-
-
 ### Configure your Azure account
 
-First let's identify your Azure subscription and save it for use later on in the quickstart.
+First let's identify your Azure subscription and save it for later use.
 
 1. Run `az login` and follow the instructions in the command output to authorize `az` to use your account
 1. List your Azure subscriptions:
@@ -71,8 +60,6 @@ First let's identify your Azure subscription and save it for use later on in the
             -v $(pwd):/root/.kube \
             microsoft/azure-cli
     ```
-    _**└──**_ _$ terminal_
-
 
 ### Create a Resource Group
 
@@ -116,11 +103,11 @@ We will start by cloning the latest broker source from OSBA's offfcial github re
 
 If you are a git user, you can clone the repository and change to it.
 
-  ```
+  ```sh
   $ git clone https://github.com/Azure/open-service-broker-azure.git
-  $ cd open-service-broker-azure
-  $ tree -L 3
-  
+  ```
+  ```sh
+  $ cd open-service-broker-azure  
     .
     ├── Dockerfile
     ├── Gopkg.lock
@@ -196,7 +183,7 @@ Open `contrib/cf/manifest.yml` and enter the values obtained in the earlier step
 
 _In a production environment, we would recommend using CREDHUB to store these values._
 
-### Pusing
+### Pushing
 
 Once you have added the necessary environment variables to the CF manifest, you can simply push the broker:
 
@@ -214,13 +201,28 @@ Now that our broker is available as an app, we can register it with Cloud Foundr
   $ cf csb open-service-broker-azure  <username> <password> https://<route> --space-scoped
   ```
 
-### Marketplace
+### Viewing the Marketplace
+
+At this point, your new service broker called `open-service-broker-azure` should show up in the marketplace along side the other services.
+
+> NOTE: Because this is a space-scoped broker, OSBA will only show up in the marketplace in the space or spaces which it is registered.
+
+* Run `cf marketplace` using the CLI. Within the marketplace, you should see a large number of service offerings prefixed by `azure-` which are advertised by the broker
+
+#### Stratos Console 
+
+If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/stratos) for Cloud Foundry
 
 ![alt text](../.media/marketplace.png)
 
-### Automating Deployment with `terraform` AzureRM Provider
+### Automation
 
-### Automating Deployment with Concourse.ci Pipeline(s)
+#### Automating Deployment with [Concourse.ci](https://concourse-ci.org)
 
+#### We Assume
+* A working knowledge of [Concourse.ci](https://concourse-ci.org) and use of [`fly` CLI](https://concourse-ci.org/fly.html).
+    * _depending on where you've installed Concourse, you may need to set up additional firewall rules to allow Concourse to reach
+    third-party sources of pipeline dependencies_
+* An understanding of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/)
 
-
+#### Automating Deployment with `terraform` AzureRM Provider
