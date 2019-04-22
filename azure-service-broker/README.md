@@ -1,5 +1,4 @@
 # Open Service Broker™ for Azure on Cloud Foundry
-# Open Service Broker™ for Azure on Cloud Foundry Container Runtime (CFCR) Managed Cluster
 
 
 This tutorial walks us through how to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry. We also illustrate leveraging `terraform` and concourse.ci pipelines, providing creation of the Azure service broker both manually and programmatically.
@@ -26,12 +25,23 @@ In order to complete the tutorial, please be sure you have:
 
 * A [Microsoft Azure account](https://portal.azure.com).
 * A working knowledge of **Azure [CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)** or use of the [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview?view=azure-cli-latest)
+    * Optionally, you use the official `azure-cli` docker container
 * A working knowledge of **Cloud Foundry** with experience using the [CLI](https://docs.cloudfoundry.org/cf-cli/).
 * A working knowledge of space-scoped service brokers. For an  introduction, see the [Simple Service Broker Quickstart Tutorial](../simple-service-broker).
-* A Cloud Foundry account and a space to deploy apps.
 * A working knowledge of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/).
+* A Cloud Foundry account and a space to deploy apps.
 
 ## Azure Setup
+
+Optionally having working knowledge of Docker, you can also use the official [`azure-cli`](https://hub.docker.com/r/microsoft/azure-cli/dockerfile) container
+
+```sh
+docker run -it --rm \
+        -v $(pwd):/root/.kube \
+        microsoft/azure-cli:<version>
+```
+_**└──**_ _$ terminal_
+
 
 ### Configure your Azure account
 
@@ -53,6 +63,16 @@ First let's identify your Azure subscription and save it for use later on in the
     ```console
     $env:AZURE_SUBSCRIPTION_ID = "<SubscriptionId>"
     ```
+
+    **Optionally, if you have Docker installed** 
+
+    ```sh
+    docker run -it --rm \
+            -v $(pwd):/root/.kube \
+            microsoft/azure-cli
+    ```
+    _**└──**_ _$ terminal_
+
 
 ### Create a Resource Group
 
@@ -99,7 +119,34 @@ If you are a git user, you can clone the repository and change to it.
   ```
   $ git clone https://github.com/Azure/open-service-broker-azure.git
   $ cd open-service-broker-azure
-  ```
+  $ tree -L 3
+  
+    .
+    ├── Dockerfile
+    ├── Gopkg.lock
+    ├── Gopkg.toml
+    ├── LICENSE
+    ├── Makefile
+    ├── README.md
+    ├── cmd
+    │   ├── broker
+    │   └── compliance-test-broker
+    ├── contrib
+    │   ├── cf
+    │   │   ├── README.md
+    │   │   ├── manifest.yml
+    │   │   └── pcf-tile
+    │   ├── cmd
+    │   │   └── cli
+    │   ├── doc-templates
+    │   │   └── module.md
+    │   ├── k8s
+    │   │   ├── charts
+    │   │   └── examples
+    │   └── openshift
+    │       └── osba-os-template.yaml
+    ├── ...
+```
 
 **Option 2: Downloading a Zip**
 
@@ -110,36 +157,6 @@ If you are not a git user, you can download a zip of the repository.
   * In a terminal window, change to the unzipped directory.
 
 ### Configuring
-
-OSBA repository directory heirarchy 
-
-```sh
-.
-├── Dockerfile
-├── Gopkg.lock
-├── Gopkg.toml
-├── LICENSE
-├── Makefile
-├── README.md
-├── cmd
-│   ├── broker
-│   └── compliance-test-broker
-├── contrib
-│   ├── cf
-│   │   ├── README.md
-│   │   ├── manifest.yml
-│   │   └── pcf-tile
-│   ├── cmd
-│   │   └── cli
-│   ├── doc-templates
-│   │   └── module.md
-│   ├── k8s
-│   │   ├── charts
-│   │   └── examples
-│   └── openshift
-│       └── osba-os-template.yaml
-├── ...
-```
 
 Open `contrib/cf/manifest.yml` and enter the values obtained in the earlier steps:
 
