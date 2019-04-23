@@ -1,6 +1,6 @@
 # Open Service Broker™ for Azure on Cloud Foundry
 
-This tutorial walks us through how to steps required to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry. We will also illustrate leveraging `terraform` and Concourse.ci pipelines, outlining creation of the Azure service broker both manually and programmatically.
+This quickstart tutorial walks us through how to steps required to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry. We will also illustrate leveraging `terraform` and Concourse.ci pipelines, outlining how to deploy the Azure open service broker (OBSA) both manually and programmatically.
 
 **Table of Contents**
 
@@ -16,7 +16,7 @@ This tutorial walks us through how to steps required to deploy the Azure open se
     * [Registering]()
         * [Viewing the Marketplace](#viewing-the-marketplace)
     * [Automating Deployment with Concourse.ci](#automation)
-        * [We Assume](#we-assume)
+        * [Assumptions](#assumptions)
     
 
 ## Prerequisites
@@ -63,13 +63,17 @@ First let's identify your Azure subscription and save it for later use.
 
 ### Create a Resource Group
 
-sCreate one with the az cli using the following command.
+Create one with the az cli using the following command.
 
 ```console
 az group create --name <CHANGEME> --location eastus
 ```
 
 ### Create a service principal
+
+Service Principals are security identities within an Azure AD tenancy that may be used by apps, services and automation tools.
+
+When you create a Service Principal then from an RBAC perspective it will, by default, have the Contributor role assigned at the subscription scope level. For most applications you would remove that and then assign a more limited RBAC role and scope assignment, but this default level is ideal for Terraform provisioning.
 
 Open Service Broker for Azure uses a service principal to provision Azure resources on your behalf or if you're using AKS, on behalf of Kubernetes.
 
@@ -137,7 +141,7 @@ If you are a git user, you can clone the repository and change to it.
 
 **Option 2: Downloading a Zip**
 
-If you are not a git user, you can download a zip of the repository.
+If you are not a git user, you can download a zip archive of the repository.
 
   * Download the zip: https://github.com/Azure/open-service-broker-azure/archive/master.zip
   * Unzip the downloaded file
@@ -181,7 +185,7 @@ Open `contrib/cf/manifest.yml` and enter the values obtained in the earlier step
         GO_INSTALL_PACKAGE_SPEC: github.com/Azure/open-service-broker-azure/cmd/broker
 ```
 
-_In a production environment, we would recommend using CREDHUB to store these values._
+_**Info**: In a production environment, we would recommend using CREDHUB to store these values._
 
 ### Pushing
 
@@ -215,14 +219,75 @@ If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/str
 
 ![alt text](../.media/marketplace.png)
 
-### Automation
+## Automation
 
-#### Automating Deployment with [Concourse.ci](https://concourse-ci.org)
-
-#### We Assume
+### Assumptions
+* An instance of Concourse installed up-and-running.
 * A working knowledge of [Concourse.ci](https://concourse-ci.org) and use of [`fly` CLI](https://concourse-ci.org/fly.html).
     * _depending on where you've installed Concourse, you may need to set up additional firewall rules to allow Concourse to reach
     third-party sources of pipeline dependencies_
 * An understanding of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/)
 
-#### Automating Deployment with `terraform` AzureRM Provider
+## Automating Deployment with [Concourse.ci](https://concourse-ci.org)
+
+### Cloning
+
+Clone this repository `cf-byo-broker` and change to it.
+
+  ```sh
+  $ git clone https://github.com/18F/cf-byo-broker.git
+  ```
+### Configuration Steps
+
+#### Set Pipeline
+
+  ```sh
+  $ fly set-pipeline -p ...
+  ```
+
+## Automating Deployment with `terraform` AzureRM Provider
+
+#### Running
+
+Change directory to `azure-service-broker\terraformation` under `cf-byo-broker` repository working directory;
+
+```
+.
+├── LICENSE.md
+├── README.md
+├── azure-service-broker
+│   ├── README.md
+│   ├── ci
+│   │   └── pipeline.yml
+│   ├── scripts
+│   │   ├── createTerraformServicePrincipal.sh
+│   │   └── splogin.sh
+│   └── terraformation
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+├── ci
+├── gcp-service-broker
+├── planning.md
+└── simple-service-broker
+```
+
+> _**Note**: Please make sure you have created the `terraform.tfvars` file as mentioned._
+
+#### Standing up environment
+
+```bash
+terraform get
+terraform init
+terraform plan -out=plan
+terraform apply plan
+```
+
+#### Tearing down environment
+
+>**Note:** This will only destroy resources deployed by Terraform. 
+
+```bash
+terraform destroy
+```
+
