@@ -227,7 +227,6 @@ If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/str
     * _depending on where you've installed Concourse, you may need to set up additional firewall rules to allow Concourse to reach
     third-party sources of pipeline dependencies_
 * An understanding of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/)
-
 ## Automating Deployment with [Concourse.ci](https://concourse-ci.org)
 
 ### Cloning
@@ -260,8 +259,8 @@ Change directory to `azure-service-broker\terraformation` under `cf-byo-broker` 
 │   ├── ci
 │   │   └── pipeline.yml
 │   ├── scripts
-│   │   ├── createTerraformServicePrincipal.sh
-│   │   └── splogin.sh
+│   │   ├── create-service-principal.sh
+│   │   └── service-principle-login.sh
 │   └── terraformation
 │       ├── main.tf
 │       ├── outputs.tf
