@@ -211,18 +211,17 @@ If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/str
 ## Automation
 
 ### Working Assumptions
-* An instance of Concourse installed up-and-running, including
-use of [`fly` CLI](https://concourse-ci.org/fly.html).
+* An instance of Concourse installed up-and-running, including [`fly` CLI](https://concourse-ci.org/fly.html).
     * _depending on where you've installed Concourse, you may need to set up additional firewall rules to allow Concourse to reach
     third-party sources of pipeline dependencies_
-* A working knowledge of [Concourse.ci](https://concourse-ci.org) and 
+* A working knowledge of [Concourse.ci](https://concourse-ci.org)
 * An working knowledge of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/)
 ## Automating Deployment
 
 ### Usage
 Create an Azure Storage Account and Container to store our `terraform.tfstate`, required by our `init-terraform-state` pipeline job
 
-> NOTE: Here, we show how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script under `/scripts`
+> NOTE: Here, we show how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script we provide under `/scripts`
 
 ### Create Redis Cache
 
@@ -248,14 +247,14 @@ $ az storage account create --name "<name>" \
 ```
 
 ```sh
-$ az storage container create --name terraformstate --account-name 18fci
+$ az storage container create --name terraformstate --account-name <name>
 ```
 ### Get Keys
 
 ```sh
-$ AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name 18fci --resource-group 18F | jq -r .[0].value)
+$ AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name <name> --resource-group <resource group> | jq -r .[0].value)
 
-$ AZURE_REDIS_PRIMARY_KEY=$(az redis list-keys -n 18f-osba-cache -g 18F | jq -r .primaryKey)
+$ AZURE_REDIS_PRIMARY_KEY=$(az redis list-keys -n <name> -g <resource group> | jq -r .primaryKey)
 ```
 
 ### CI Pipelines
