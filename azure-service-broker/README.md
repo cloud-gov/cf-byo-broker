@@ -58,7 +58,7 @@ In order to complete the tutorial, please be sure you have:
     ```console
     $env:AZURE_SUBSCRIPTION_ID = "<SubscriptionId>"
     ```
-    
+
 ### Create a Resource Group
 
 Create one with the az cli using the following command.
@@ -230,19 +230,10 @@ If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/str
 ### Usage
 Create an Azure Storage Account and Container to store our `terraform.tfstate`, required by our `init-terraform-state` pipeline job
 
-> NOTE: Here, we show how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script we provide under `/scripts`
-
-### Create Redis Cache Store
-
-```sh
-$ az redis create -n <unique-cache-name> \
-  -g <resource group> \
-  -l <region> \
-  --sku Standard \
-  --vm-size C1
-```
-
 ### Create Azure Storage
+> _Similar to how [OSBA]() required we create a backup [Redis Cache Store](#create-redis-cache-store), here we create an [Azure Storage Container]() to hold our `terraform.tfstate`._  
+>
+> _We illustrate how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script we provide under `/scripts`_
 
 ```sh
 $ az group create --name "<name>" \

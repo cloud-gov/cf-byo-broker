@@ -34,9 +34,8 @@ resources:
 - name: cf-byo-broker
   type: git
   source:
-    uri: git@github.com:ramene/cf-byo-broker.git
-    branch: master
-    private_key: {{git_private_key}}
+    uri: https://github.com/ramene/cf-byo-broker.git
+    branch: osba
 
 jobs:
 - name: init-terraform-state
