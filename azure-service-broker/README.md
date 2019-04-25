@@ -107,11 +107,8 @@ Open Service Broker for Azure uses a service principal to provision Azure resour
 
 ### Cloning
 
-We will start by cloning the latest broker source from [OSBA](https://github.com/Azure/open-service-broker-azure)'s offfcial github repository. If you don't have `git` installed, you can also download a zip file of the broker source.
+> We will start by cloning the latest broker source from [OSBA](https://github.com/Azure/open-service-broker-azure)'s offfcial github repository. If you don't have `git` installed, you can also download a zip file of the broker source.
 
-**Option 1: Cloning**
-
-If you are a git user, you can clone the repository and change to it.
 
   ```sh
   $ git clone https://github.com/Azure/open-service-broker-azure.git
@@ -137,19 +134,11 @@ If you are a git user, you can clone the repository and change to it.
     ├── ...
 ```
 
-**Option 2: Downloading a Zip**
-
-If you are not a git user, you can download a zip archive of the repository.
-
-  * Download the zip: https://github.com/Azure/open-service-broker-azure/archive/master.zip
-  * Unzip the downloaded file
-  * In a terminal window, change to the unzipped directory.
-
 ### Configuring
 
 Let's edit our manifest at `contrib/cf/manifest.yml` and enter the values obtained in the earlier steps:
 
-> NOTE: In later steps, we show how to automate this step and generate our `manifest.yml` using create-storage-provider.sh interactive script under `/scripts`
+> _In later steps, we show how to automate this step and generate our `manifest.yml` using create-storage-provider.sh interactive script under `/scripts`_
 
 ```yaml
 ---
@@ -296,7 +285,7 @@ $ AZURE_REDIS_PRIMARY_KEY=$(az redis list-keys -n 18f-osba-cache -g 18F | jq -r 
 ```
 ## Using Concourse.ci
 
-#### Log into concourse and set the pipeline
+> Log into concourse and set the pipeline
 
   ```sh
   $ fly -t bosh-lite login --concourse-url http://192.168.100.4:8080
