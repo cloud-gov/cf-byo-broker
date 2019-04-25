@@ -40,7 +40,7 @@ In order to complete the tutorial, please be sure you have:
 
 ### Configure your Azure account
 
-First let's identify your Azure subscription and save it for later use.
+> First let's identify your Azure subscription and save its output for later use in our deployment
 
 1. Run `az login` and follow the instructions in the command output to authorize `az` to use your account
 1. List your Azure subscriptions:
@@ -58,15 +58,7 @@ First let's identify your Azure subscription and save it for later use.
     ```console
     $env:AZURE_SUBSCRIPTION_ID = "<SubscriptionId>"
     ```
-
-    **Optionally, if you have Docker installed** 
-
-    ```sh
-    docker run -it --rm \
-            -v $(pwd):/root/.kube \
-            microsoft/azure-cli
-    ```
-
+    
 ### Create a Resource Group
 
 Create one with the az cli using the following command.
@@ -74,8 +66,25 @@ Create one with the az cli using the following command.
 ```console
 az group create --name <CHANGEME> --location eastus
 ```
+### Create Redis Cache Store
 
-### Create a service principal
+Open Service Broker for Azure uses Redis as a backing store for its state. We recommend using a managed Redis service, such as Azure Redis Cache. You can use the Azure CLI to determine if Azure Redis Cache is enabled for your subscription:
+
+```sh
+$ az redis create -n <name> \
+  -g <resource group> \
+  -l <region> \
+  --sku Standard \
+  --vm-size C1
+```
+
+Get Redis Cache `Primary Key`
+
+```sh
+$ az redis list-keys -n <name> -g <resource group> | jq -r .primaryKey
+```
+
+### Create a Service Principal
 
 Service Principals are security identities within an Azure AD tenancy that may be used by apps, services and automation tools.
 
@@ -223,7 +232,7 @@ Create an Azure Storage Account and Container to store our `terraform.tfstate`, 
 
 > NOTE: Here, we show how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script we provide under `/scripts`
 
-### Create Redis Cache
+### Create Redis Cache Store
 
 ```sh
 $ az redis create -n <unique-cache-name> \

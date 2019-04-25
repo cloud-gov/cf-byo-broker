@@ -39,9 +39,6 @@ resources:
     private_key: {{git_private_key}}
 
 jobs:
-####################################
-## Job - Boostrap Terraform State ##
-####################################
 - name: init-terraform-state
   plan:
   - get: cf-byo-broker
@@ -62,9 +59,6 @@ jobs:
       CONTAINER: {{azure_storage_container_name}}
     file: cf-byo-broker/azure-service-broker/ci/tasks/init-terraform-state/task.yml
     
-#####################
-## Job - Wipe Env  ##
-#####################
 - name: destroy
   serial: true
   max_in_flight: 1
@@ -89,9 +83,6 @@ jobs:
       AZURE_REGION: {{azure_region}}
       AZURE_TERRAFORM_PREFIX: {{azure_terraform_prefix}}
 
-#################################
-## Job - Create Infrastructure ##
-#################################
 - name: prepare-env
   serial: true
   max_in_flight: 1
