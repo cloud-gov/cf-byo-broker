@@ -15,8 +15,14 @@ This tutorial walks us through how to steps required to deploy the Azure open se
     * [Pushing]()
     * [Registering]()
         * [Viewing the Marketplace](#viewing-the-marketplace)
-    * [Automating Deployment with Concourse.ci](#automation)
-        * [Assumptions](#assumptions)
+* [Automation](#automation)
+    * [Working Assumptions](#working-assumptions)
+    * [Automating Deployment](#automating-deployment)
+        * [Usage](#usage)
+        * [CI Pipelines](#ci-pipelines)
+        * [Using Concourse.ci](#using-concourse.ci)
+        * [Using terraform CLI](#using-terraform-cli)
+
     
 
 ## Prerequisites
@@ -101,7 +107,7 @@ Open Service Broker for Azure uses a service principal to provision Azure resour
 
 ### Cloning
 
-We will start by cloning the latest broker source from OSBA's offfcial github repository. If you don't have `git` installed, you can also download a zip file of the broker source.
+We will start by cloning the latest broker source from [OSBA](https://github.com/Azure/open-service-broker-azure)'s offfcial github repository. If you don't have `git` installed, you can also download a zip file of the broker source.
 
 **Option 1: Cloning**
 
@@ -216,7 +222,7 @@ If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/str
 ## Automation
 
 ### Working Assumptions
-* An instance of Concourse installed up-and-running.
+* An instance of Concourse installed up-and-running, including
 use of [`fly` CLI](https://concourse-ci.org/fly.html).
     * _depending on where you've installed Concourse, you may need to set up additional firewall rules to allow Concourse to reach
     third-party sources of pipeline dependencies_
@@ -225,28 +231,47 @@ use of [`fly` CLI](https://concourse-ci.org/fly.html).
 ## Automating Deployment
 
 ### Usage
-Create an Azure Storage Account and Container to store our `terraform.tfstate`, required by our `init-terraform-state` concourse.ci job
+Create an Azure Storage Account and Container to store our `terraform.tfstate`, required by our `init-terraform-state` pipeline job
+
+> NOTE: Here, we show how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script under `/scripts`
+
+### Create Redis Cache
 
 ```sh
-$ az group create --name "18fci" \
-  --location "EastUS"
+$ az redis create -n <unique-cache-name> \
+  -g <resource group> \
+  -l <region> \
+  --sku Standard \
+  --vm-size C1
+```
+
+### Create Azure Storage
+
+```sh
+$ az group create --name "<name>" \
+  --location "<region>"
 ```
 ```sh
-$ az storage account create --name "18fci" \
-  --resource-group "18F" \
-  --location "EastUS" \
+$ az storage account create --name "<name>" \
+  --resource-group "<resource group>" \
+  --location "<region>" \
   --sku "Standard_LRS"
 ```
 
 ```sh
-$ AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name 18fci --resource-group 18F | jq -r .[0].value)
-
 $ az storage container create --name terraformstate --account-name 18fci
 ```
+### Get Keys
 
-### Cloning
+```sh
+$ AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name 18fci --resource-group 18F | jq -r .[0].value)
 
-First, we'll clone this repository [cf-byo-broker](https://github.com/18F/cf-byo-broker) containing all the artifacts required.
+$ AZURE_REDIS_PRIMARY_KEY=$(az redis list-keys -n 18f-osba-cache -g 18F | jq -r .primaryKey)
+```
+
+### CI Pipelines
+
+> _The pipeline(s) we'll be using are maintained in this same repostory. If you haven't already, let's clone this repository [cf-byo-broker](https://github.com/18F/cf-byo-broker) containing all the artifacts required._
 
   ```sh
   $ git clone https://github.com/18F/cf-byo-broker.git
@@ -269,9 +294,9 @@ First, we'll clone this repository [cf-byo-broker](https://github.com/18F/cf-byo
 │       └── variables.tf
 └── ...
 ```
-### Configuration Steps
+## Using Concourse.ci
 
-#### Log into concourse and create the pipeline.
+#### Log into concourse and set the pipeline
 
   ```sh
   $ fly -t bosh-lite login --concourse-url http://192.168.100.4:8080
@@ -285,7 +310,7 @@ First, we'll clone this repository [cf-byo-broker](https://github.com/18F/cf-byo
 
 ![Concourse.ci Dashboard](../.media/dashboard.png)
 
-## Automating Deployment with `terraform` AzureRM Provider
+## Using `terraform` CLI
 
 Change directory to `cf-byo-broker\azure-service-broker\terraformation`
 
