@@ -274,6 +274,10 @@ First, we'll clone this repository [cf-byo-broker](https://github.com/18F/cf-byo
 #### Log into concourse and create the pipeline.
 
   ```sh
+  $ fly -t bosh-lite login --concourse-url http://192.168.100.4:8080
+  ```
+
+  ```sh
   $ fly -t bosh-lite set-pipeline -p install-osba-cf \
     -c azure-service-broker/ci/pipeline.yml \
     -l azure-service-broker/ci/params.yml

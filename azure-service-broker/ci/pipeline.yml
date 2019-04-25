@@ -2,13 +2,13 @@ groups:
 
 - name: all
   jobs:
-  - bootstrap-terraform-state
+  - init-terraform-state
   - deploy-osba
   - prepare-env
 
 - name: prep
   jobs:
-  - bootstrap-terraform-state
+  - init-terraform-state
   - prepare-env
 
 - name: deploy-osba
@@ -42,8 +42,7 @@ jobs:
 ####################################
 ## Job - Boostrap Terraform State ##
 ####################################
-- name: bootstrap-terraform-state
-  serial_groups: [terraform]
+- name: init-terraform-state
   plan:
   - get: cf-byo-broker
   - task: create-terraform-state
@@ -51,10 +50,9 @@ jobs:
       AZURE_STORAGE_ACCOUNT: {{terraform_azure_storage_account_name}}
       AZURE_STORAGE_KEY: {{terraform_azure_storage_access_key}}
       CONTAINER: {{azure_storage_container_name}}
-    file: cf-byo-broker/azure-service-broker/ci/tasks/create-initial-terraform-state/task.yml
+    file: cf-byo-broker/azure-service-broker/ci/tasks/init-terraform-state/task.yml
 
 - name: deploy-osba
-  serial_groups: [terraform]
   plan:
   - get: cf-byo-broker
   - task: create-terraform-state
@@ -62,7 +60,7 @@ jobs:
       AZURE_STORAGE_ACCOUNT: {{terraform_azure_storage_account_name}}
       AZURE_STORAGE_KEY: {{terraform_azure_storage_access_key}}
       CONTAINER: {{azure_storage_container_name}}
-    file: cf-byo-broker/azure-service-broker/ci/tasks/create-initial-terraform-state/task.yml
+    file: cf-byo-broker/azure-service-broker/ci/tasks/init-terraform-state/task.yml
     
 #####################
 ## Job - Wipe Env  ##
@@ -81,7 +79,7 @@ jobs:
     - get: terraform-state
 
   - task: destroy
-    file: cf-byo-broker/azure-service-broker/ci/tasks/wipe-env/task.yml
+    file: cf-byo-broker/azure-service-broker/ci/tasks/destroy/task.yml
     params:
       ARG_WIPE: {{arg_wipe}}
       AZURE_SUBSCRIPTION_ID: {{azure_subscription_id}}
@@ -108,7 +106,7 @@ jobs:
     - get: terraform-state
 
   - task: prepare-env
-    file: cf-byo-broker/azure-service-broker/ci//tasks/create-infrastructure/task.yml
+    file: cf-byo-broker/azure-service-broker/ci/tasks/prepare-env/task.yml
     params:
       AZURE_SUBSCRIPTION_ID: {{azure_subscription_id}}
       AZURE_TENANT_ID: {{azure_tenant_id}}
