@@ -6,9 +6,9 @@ This repository houses tutorials showing users how to bring their own service br
 
 * [GCP Spanner Service Broker](gcp-service-broker): This tutorial shows you how to deploy the Google Cloud Platform (GCP) service broker to a space in Cloud Foundry and configure it to provision Spanner instances. It includes a sample application that will connect to a Google Spanner instance provisioned by the broker.
 
-* [Azure Service Broker Tutorial](azure-service-broker): This tutorial walks us through how to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry.  We also illustrate leveraging `terraform` and concourse.ci pipelines, providing creation of the Azure service broker both manually and programmatically. 
+* [Azure Service Broker Tutorial](azure-service-broker): This tutorial walks us through how to steps required to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry. We will also illustrate leveraging terraform and Concourse.ci pipelines, outlining how to deploy the Azure open service broker (OBSA) both manually and programmatically.
 
-    At the end of this tutorial, you will know how to provision OSBA either manually or via automation and you will be able to find the Azure services avaiable via the CF marketplace
+    At the end of this tutorial, you will know how to provision OSBA either manually or via automation and you will be able to find the Azure services available via the CF marketplace
 
 ## Contributing
 

@@ -1,6 +1,6 @@
 # Open Service Broker™ for Azure on Cloud Foundry
 
-This quickstart tutorial walks us through how to steps required to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry. We will also illustrate leveraging `terraform` and Concourse.ci pipelines, outlining how to deploy the Azure open service broker (OBSA) both manually and programmatically.
+This tutorial walks us through how to steps required to deploy the Azure open service broker (OSBA) to a scoped space on Cloud Foundry. We will also illustrate leveraging `terraform` and Concourse.ci pipelines, outlining how to deploy the Azure open service broker (OBSA) both manually and programmatically.
 
 **Table of Contents**
 
@@ -127,15 +127,7 @@ If you are a git user, you can clone the repository and change to it.
     │   │   ├── README.md
     │   │   ├── manifest.yml
     │   │   └── pcf-tile
-    │   ├── cmd
-    │   │   └── cli
-    │   ├── doc-templates
-    │   │   └── module.md
-    │   ├── k8s
-    │   │   ├── charts
-    │   │   └── examples
-    │   └── openshift
-    │       └── osba-os-template.yaml
+    │   ├── ...
     ├── ...
 ```
 
@@ -149,7 +141,9 @@ If you are not a git user, you can download a zip archive of the repository.
 
 ### Configuring
 
-Open `contrib/cf/manifest.yml` and enter the values obtained in the earlier steps:
+Let's edit our manifest at `contrib/cf/manifest.yml` and enter the values obtained in the earlier steps:
+
+> NOTE: In later steps, we show how to automate this step and generate our `manifest.yml` using create-storage-provider.sh interactive script under `/scripts`
 
 ```yaml
 ---
@@ -217,43 +211,51 @@ At this point, your new service broker called `open-service-broker-azure` should
 
 If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/stratos) for Cloud Foundry
 
-![alt text](../.media/marketplace.png)
+![Stratos Marketplace](../.media/marketplace.png)
 
 ## Automation
 
-### Assumptions
+### Working Assumptions
 * An instance of Concourse installed up-and-running.
-* A working knowledge of [Concourse.ci](https://concourse-ci.org) and use of [`fly` CLI](https://concourse-ci.org/fly.html).
+use of [`fly` CLI](https://concourse-ci.org/fly.html).
     * _depending on where you've installed Concourse, you may need to set up additional firewall rules to allow Concourse to reach
     third-party sources of pipeline dependencies_
-* An understanding of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/)
-## Automating Deployment with [Concourse.ci](https://concourse-ci.org)
+* A working knowledge of [Concourse.ci](https://concourse-ci.org) and 
+* An working knowledge of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/)
+## Automating Deployment
+
+### Usage
+Create an Azure Storage Account and Container to store our `terraform.tfstate`, required by our `init-terraform-state` concourse.ci job
+
+```sh
+$ az group create --name "18fci" \
+  --location "EastUS"
+```
+```sh
+$ az storage account create --name "18fci" \
+  --resource-group "18F" \
+  --location "EastUS" \
+  --sku "Standard_LRS"
+```
+
+```sh
+$ AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name 18fci --resource-group 18F | jq -r .[0].value)
+
+$ az storage container create --name terraformstate --account-name 18fci
+```
 
 ### Cloning
 
-Clone this repository `cf-byo-broker` and change to it.
+First, we'll clone this repository [cf-byo-broker](https://github.com/18F/cf-byo-broker) containing all the artifacts required.
 
   ```sh
   $ git clone https://github.com/18F/cf-byo-broker.git
   ```
-### Configuration Steps
 
-#### Set Pipeline
-
-  ```sh
-  $ fly set-pipeline -p ...
-  ```
-
-## Automating Deployment with `terraform` AzureRM Provider
-
-#### Running
-
-Change directory to `azure-service-broker\terraformation` under `cf-byo-broker` repository working directory;
+  Change directory to `cf-byo-broker\azure-service-broker`
 
 ```
 .
-├── LICENSE.md
-├── README.md
 ├── azure-service-broker
 │   ├── README.md
 │   ├── ci
@@ -265,15 +267,37 @@ Change directory to `azure-service-broker\terraformation` under `cf-byo-broker` 
 │       ├── main.tf
 │       ├── outputs.tf
 │       └── variables.tf
-├── ci
-├── gcp-service-broker
-├── planning.md
-└── simple-service-broker
+└── ...
+```
+### Configuration Steps
+
+#### Log into concourse and create the pipeline.
+
+  ```sh
+  $ fly -t bosh-lite set-pipeline -p install-osba-cf \
+    -c azure-service-broker/ci/pipeline.yml \
+    -l azure-service-broker/ci/params.yml
+  ```
+
+![Concourse.ci Dashboard](../.media/dashboard.png)
+
+## Automating Deployment with `terraform` AzureRM Provider
+
+Change directory to `cf-byo-broker\azure-service-broker\terraformation`
+
+```
+.
+├── LICENSE.md
+├── azure-service-broker
+│   ├── ...
+│   └── terraformation
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+└── ...
 ```
 
 > _**Note**: Please make sure you have created the `terraform.tfvars` file as mentioned._
-
-#### Standing up environment
 
 ```bash
 terraform get
