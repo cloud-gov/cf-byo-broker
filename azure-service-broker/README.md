@@ -21,8 +21,8 @@ This tutorial walks us through how to steps required to deploy the Azure open se
         * [Usage](#usage)
         * [CI Pipelines](#ci-pipelines)
         * [Using Concourse.ci](#using-concourse.ci)
-        * [Using terraform CLI](#using-terraform-cli)
-
+       * [Using terraform CLI](#using-terraform-cli)
+    * [Troubleshooting](#troubleshooting)
     
 
 ## Prerequisites
@@ -330,4 +330,7 @@ terraform apply plan
 ```bash
 terraform destroy
 ```
+
+## Troubleshooting
+
 
