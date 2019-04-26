@@ -6,7 +6,7 @@ az login --service-principal --username ${AZURE_CLIENT_ID} --password ${AZURE_CL
 
 az account set --subscription ${AZURE_SUBSCRIPTION_ID}
 
-blobs=$(az storage blob list -c ${CONTAINER} --connection-string ${CONNECTION_STRING})
+blobs=$(az storage blob list -c ${CONTAINER})
 files=$(echo "$blobs" | jq -r .[].name)
 
 set +e
