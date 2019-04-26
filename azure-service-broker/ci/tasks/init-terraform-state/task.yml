@@ -27,6 +27,7 @@ params:
   AZURE_STORAGE_ACCOUNT:
   AZURE_STORAGE_KEY:
   CONTAINER:
+  CONNECTION_STRING:
 
 run:
   path: cf-byo-broker/azure-service-broker/ci/tasks/init-terraform-state/task.sh

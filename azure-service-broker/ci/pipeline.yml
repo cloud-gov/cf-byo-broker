@@ -20,7 +20,7 @@ resource_types:
 - name: azure-blobstore
   type: docker-image
   source:
-    repository: czero/azure-blobstore-resource
+    repository: pcfabr/azure-blobstore-resource
 
 resources:
 - name: terraform-state
@@ -46,6 +46,7 @@ jobs:
       AZURE_STORAGE_ACCOUNT: {{terraform_azure_storage_account_name}}
       AZURE_STORAGE_KEY: {{terraform_azure_storage_access_key}}
       CONTAINER: {{azure_storage_container_name}}
+      CONNECTION_STRING: {{azure_storage_connection_string}}
     file: cf-byo-broker/azure-service-broker/ci/tasks/init-terraform-state/task.yml
 
 - name: deploy-osba
@@ -80,7 +81,6 @@ jobs:
       AZURE_CLIENT_ID: {{azure_client_id}}
       AZURE_CLIENT_SECRET: {{azure_client_secret}}
       AZURE_REGION: {{azure_region}}
-      AZURE_TERRAFORM_PREFIX: {{azure_terraform_prefix}}
 
 - name: prepare-env
   serial: true

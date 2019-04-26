@@ -1,8 +1,8 @@
 #!/bin/bash
 
-set -ex
+set -eux
 
-blobs=$(az storage blob list -c ${CONTAINER})
+blobs=$(az storage blob list -c ${CONTAINER} --connection-string ${CONNECTION_STRING})
 files=$(echo "$blobs" | jq -r .[].name)
 
 set +e
