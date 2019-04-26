@@ -43,7 +43,11 @@ jobs:
   - get: cf-byo-broker
   - task: create-terraform-state
     params:
+      AZURE_TENANT_ID: {{azure_tenant_id}}
+      AZURE_CLIENT_ID: {{azure_client_id}}
+      AZURE_CLIENT_SECRET: {{azure_client_secret}}
       AZURE_STORAGE_ACCOUNT: {{terraform_azure_storage_account_name}}
+      AZURE_SUBSCRIPTION_ID: {{azure_subscription_id}}
       AZURE_STORAGE_KEY: {{terraform_azure_storage_access_key}}
       CONTAINER: {{azure_storage_container_name}}
       CONNECTION_STRING: {{azure_storage_connection_string}}
