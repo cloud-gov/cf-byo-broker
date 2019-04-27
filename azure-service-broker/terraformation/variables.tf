@@ -1,16 +1,27 @@
-variable "env_name" {}
-
-variable "cloud_name" {
-  description = "The Azure cloud environment to use. Available values at https://www.terraform.io/docs/providers/azurerm/#environment"
-  default     = "public"
+variable "prefix" {
+  default = "ci"
 }
 
-variable "subscription_id" {}
+variable "environment" {
+  default = "dev"
+}
 
-variable "tenant_id" {}
+variable "location" {
+  default = "eastus"
+}
 
-variable "client_id" {}
+variable "resource_group_name" {
+  default = "18F"
+}
 
-variable "client_secret" {}
+variable "account_tier" {
+  default = "standard"
+}
 
-variable "location" {}
+variable "storage_account_replication_type" {
+  default = "LRS"
+}
+
+variable "storage_account_name" {
+  default = "tfstate"
+}

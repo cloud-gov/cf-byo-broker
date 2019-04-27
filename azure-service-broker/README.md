@@ -314,13 +314,35 @@ Change directory to `cf-byo-broker\azure-service-broker\terraformation`
 └── ...
 ```
 
-> _**Note**: Please make sure you have created the `terraform.tfvars` file as mentioned._
+#### AzureRM Backend
+
+```yml
+terraform {
+  backend "azurerm" {
+    storage_account_name  = "18fci"
+    container_name        = "terraformstate"
+    key                   = "terraform.tfstate"
+  }
+  required_version = "~> 0.11.13"
+}
+
+```
+
+> **Note**: _[When authenticating using the Storage Account's Access Key](https://www.terraform.io/docs/backends/types/azurerm.html) - the following fields and in our case, environement variables are also supported.
+
+* _**access_key**_ - (Optional) The Access Key used to    access the Blob Storage Account. This can also be sourced from the ARM_ACCESS_KEY environment variable.
+
+Let's set our _**access_key**_ now. 
+
+    ```sh
+    $ export ARM_ACCESS_KEY=$(az storage account keys list --account-name 18fci --resource-group 18F | jq -r .[0].value)
+    ```
 
 ```bash
 terraform get
 terraform init
 terraform plan -out=plan
-terraform apply plan
+terraform apply "plan"
 ```
 
 #### Tearing down environment
