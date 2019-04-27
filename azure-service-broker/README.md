@@ -233,7 +233,7 @@ Create an Azure Storage Account and Container to store our `terraform.tfstate`, 
 ### Create Azure Storage
 > _Similar to how [OSBA]() required we create a backup [Redis Cache Store](#create-redis-cache-store), here we create an [Azure Storage Container]() to hold our `terraform.tfstate`._  
 >
-> _We illustrate how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script we provide under `/scripts`_
+> _We illustrate how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script provided under `/scripts`_
 
 ```sh
 $ az group create --name "<name>" \
@@ -328,21 +328,20 @@ terraform {
 
 ```
 
-> **Note**: _[When authenticating using the Storage Account's Access Key](https://www.terraform.io/docs/backends/types/azurerm.html) - the following fields and in our case, environement variables are also supported.
+> **Note**: _[When authenticating using the Storage Account's Access Key](https://www.terraform.io/docs/backends/types/azurerm.html) - the following fields and in our case, environement variables are also supported._
 
 * _**access_key**_ - (Optional) The Access Key used to    access the Blob Storage Account. This can also be sourced from the ARM_ACCESS_KEY environment variable.
 
 Let's set our _**access_key**_ now. 
 
-    ```sh
+    
     $ export ARM_ACCESS_KEY=$(az storage account keys list --account-name 18fci --resource-group 18F | jq -r .[0].value)
-    ```
+    
 
 ```bash
-terraform get
-terraform init
-terraform plan -out=plan
-terraform apply "plan"
+$ terraform init
+$ terraform plan -out=plan
+$ terraform apply "plan"
 ```
 
 #### Tearing down environment
