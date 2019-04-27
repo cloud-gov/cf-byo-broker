@@ -85,14 +85,17 @@ $ az redis create -n <name> \
   --sku Standard \
   --vm-size C1
 ```
+> _Note the `hostName` and `primaryKey` in the output as this will be needed in subsequent steps._
 
-Get Redis Cache `Primary Key`
+* ### Get Redis `Primary Key`
 
-```sh
-$ az redis list-keys -n <name> -g <resource group> | jq -r .primaryKey
-```
-> _Note the `hostName` and `primaryKey` in the output as this will be needed later._
 
+    > ##### _**Recommended**_ 
+    >
+    > _Let's set our [`AZURE_REDIS_PRIMARY_KEY`]() environment variable now._ 
+    >
+    >     $ export AZURE_REDIS_PRIMARY_KEY=$(az redis list-keys -n <name> -g <resource group> | jq -r .primaryKey)
+    
 
 
 ### Create a Service Principal
@@ -105,11 +108,9 @@ $ az redis list-keys -n <name> -g <resource group> | jq -r .primaryKey
 >When you create a Service Principal then from an RBAC perspective it will, by default, have the Contributor role assigned at the subscription scope level. For most applications you would remove that and then assign a more limited RBAC role and scope assignment, but this default level is ideal for Terraform provisioning.
 
 1. Create a service principal with RBAC enabled:
-    ```console
+    ```sh
     $ az ad sp create-for-rbac --name osba -o table
-    ```
-    ###### _sample output_
-    ```yml
+    ...
     {
       "appId": "d4835aa9-21a9-433b-b9aac-XXXXXXXXXXXX",
       "displayName": "super-duper-sp-2019-04-22-03-23-53",
@@ -259,7 +260,7 @@ _Within the marketplace, you should see a large number of service offerings pref
 
 > _Alternatively, if you have an existing [Storage Account]() and [Container]() you would prefer to use we can [Skip](#ci-pipelines) this step._
 >
-> _Remember to note the `storage_account_name` and `container` in the output as this will be needed later to populate or pipeline `params.yml`_
+> _Note the `storage_account_name` and `container` respective to your account as this will be needed later to populate or pipeline `params.yml`_
 
 ```sh
 $ az group create --name CHANGME \
@@ -275,22 +276,17 @@ $ az storage account create --name CHANGME \
 ```sh
 $ az storage container create --name terraformstate --account-name CHANGME
 ```
-### Get Keys
-
-```sh
-$ AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name <name> --resource-group <resource group> | jq -r .[0].value)
-
-$ AZURE_REDIS_PRIMARY_KEY=$(az redis list-keys -n <name> -g <resource group> | jq -r .primaryKey)
-```
 
 ### CI Pipelines
 
-Before we continue, let's make sure we have all the requisite information required for configuring our pipeline(s).  using the environment variable we `set` earlier
+> Before we continue, let's make sure we have all the requisite information required for configuring our pipeline(s).  using the environment variable we `set` up to this point
 
+* [AZURE_REDIS_PRIMARY_KEY](#get-redis-primary-key)
 * [AZURE_SUBSCRIPTION_ID](#configure-your-azure-account)
 * [AZURE_TENANT_ID](#create-a-service-principal)
-AZURE_CLIENT_ID=<AppId>
-AZURE_CLIENT_SECRET=<Password>
+* [AZURE_CLIENT_ID](#create-a-service-principal)
+* [AZURE_CLIENT_SECRET](#create-a-service-principal)
+* [ARM_ACCESS_KEY](#azurerm-backend)
 
 > _The pipeline(s) we'll be using are maintained in this same repostory. If you haven't already, let's clone this repository [cf-byo-broker](https://github.com/18F/cf-byo-broker) containing all the artifacts required._
 
@@ -311,8 +307,6 @@ AZURE_CLIENT_SECRET=<Password>
 │   │   └── service-principle-login.sh
 │   └── terraformation
 │       ├── main.tf
-│       ├── outputs.tf
-│       └── variables.tf
 └── ...
 ```
 ## Using Concourse.ci
@@ -353,7 +347,7 @@ _The Terraform state backend is configured when running Terraform init. In order
 * _**key**_ - The name of the state store file to be created.
 * _**access_key**_ - The storage access key.
       
-    > #### _**Recommended**_ 
+    > ##### _Recommended_ 
     >_This can also be sourced from the ARM_ACCESS_KEY environment variable._
     >
     > Let's set our [`ARM_ACCESS_KEY`](https://www.terraform.io/docs/backends/types/azurerm.html) storage account key now. 
@@ -364,8 +358,8 @@ _The Terraform state backend is configured when running Terraform init. In order
 ```yml
 terraform {
   backend "azurerm" {
-    storage_account_name  = "18fci"
-    container_name        = "terraformstate"
+    storage_account_name  = "${storage_container_name}"
+    container_name        = "${container}"
     key                   = "terraform.tfstate"
   }
   required_version = "~> 0.11.13"
