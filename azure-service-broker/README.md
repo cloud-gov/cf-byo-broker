@@ -19,9 +19,10 @@ This tutorial walks us through how to steps required to deploy the Azure open se
     * [Working Assumptions](#working-assumptions)
     * [Automating Deployment](#automating-deployment)
         * [Usage](#usage)
-        * [CI Pipelines](#ci-pipelines)
         * [Using Concourse.ci](#using-concourse.ci)
+          * [Pipelines](#ci-pipelines)
        * [Using terraform CLI](#using-terraform-cli)
+          * [AzureRM Backend](#azurerm-backend)
     * [Troubleshooting](#troubleshooting)
     
 
@@ -40,21 +41,21 @@ In order to complete the tutorial, please be sure you have:
 
 ### Configure your Azure account
 
-> First let's identify your Azure subscription and save its output for later use in our deployment
+> First let's identify your Azure subscription and **save** its output for later use in our deployment
 
 1. Run `az login` and follow the instructions in the command output to authorize `az` to use your account
-1. List your Azure subscriptions:
+2. List your Azure subscriptions:
     ```console
     az account list -o table
     ```
-1. Copy your subscription ID and save it in an environment variable:
+3. Copy your subscription ID and _**save it in an environment variable**_:
 
-    **Bash**
+    ### bash
     ```console
     export AZURE_SUBSCRIPTION_ID="<SubscriptionId>"
     ```
 
-    **PowerShell**
+    ### powershell
     ```console
     $env:AZURE_SUBSCRIPTION_ID = "<SubscriptionId>"
     ```
@@ -64,11 +65,18 @@ In order to complete the tutorial, please be sure you have:
 Create one with the az cli using the following command.
 
 ```console
-az group create --name <CHANGEME> --location eastus
+az group create --name CHANGEME --location CHANGME
 ```
 ### Create Redis Cache Store
 
 Open Service Broker for Azure uses Redis as a backing store for its state. We recommend using a managed Redis service, such as Azure Redis Cache. You can use the Azure CLI to determine if Azure Redis Cache is enabled for your subscription:
+
+```sh
+$ az provider show -n Microsoft.Cache -o table
+Namespace        RegistrationState
+---------------  -------------------
+Microsoft.Cache  Registered
+```
 
 ```sh
 $ az redis create -n <name> \
@@ -83,29 +91,45 @@ Get Redis Cache `Primary Key`
 ```sh
 $ az redis list-keys -n <name> -g <resource group> | jq -r .primaryKey
 ```
+> _Note the `hostName` and `primaryKey` in the output as this will be needed later._
+
+
 
 ### Create a Service Principal
-
-Service Principals are security identities within an Azure AD tenancy that may be used by apps, services and automation tools.
-
-When you create a Service Principal then from an RBAC perspective it will, by default, have the Contributor role assigned at the subscription scope level. For most applications you would remove that and then assign a more limited RBAC role and scope assignment, but this default level is ideal for Terraform provisioning.
-
-Open Service Broker for Azure uses a service principal to provision Azure resources on your behalf or if you're using AKS, on behalf of Kubernetes.
+ Open Service Broker for Azure uses a service principal to provision Azure resources on your behalf or if you're using AKS, on behalf of Kubernetes.
+>
+> #### _TL;DR_
+> 
+>Service Principals are security identities within an Azure AD tenancy that may be used by apps, services and automation tools.
+>
+>When you create a Service Principal then from an RBAC perspective it will, by default, have the Contributor role assigned at the subscription scope level. For most applications you would remove that and then assign a more limited RBAC role and scope assignment, but this default level is ideal for Terraform provisioning.
 
 1. Create a service principal with RBAC enabled:
     ```console
-    az ad sp create-for-rbac --name osba -o table
+    $ az ad sp create-for-rbac --name osba -o table
     ```
-1. Save the values from the command output in environment variables:
+    ###### _sample output_
+    ```yml
+    {
+      "appId": "d4835aa9-21a9-433b-b9aac-XXXXXXXXXXXX",
+      "displayName": "super-duper-sp-2019-04-22-03-23-53",
+      "name": "http://super-duper-sp-2019-04-22-03-23-53",
+      "password": "4a50b835-a88f-4344-9aac-XXXXXXXXXXXX",
+      "tenant": "b0d61fa6-925c-42cc-b398-XXXXXXXXXXXX"
+    }
+    ```
+    > _Note the `appId` and `tenant` and `password` in the output as this will be needed in subsequent steps._
 
-    **Bash**
+2. Save the values from the command output in environment variables:
+
+    ### bash
     ```console
     export AZURE_TENANT_ID=<Tenant>
     export AZURE_CLIENT_ID=<AppId>
     export AZURE_CLIENT_SECRET=<Password>
     ```
 
-    **PowerShell**
+    ### powershell
     ```console
     $env:AZURE_TENANT_ID = "<Tenant>"
     $env:AZURE_CLIENT_ID = "<AppId>"
@@ -189,8 +213,8 @@ _**Info**: In a production environment, we would recommend using CREDHUB to stor
 
 Once you have added the necessary environment variables to the CF manifest, you can simply push the broker:
 
-```console
-cf push -f contrib/cf/manifest.yml
+```sh
+$ cf push -f contrib/cf/manifest.yml
 ```
 
 ### Registering
@@ -209,13 +233,17 @@ At this point, your new service broker called `open-service-broker-azure` should
 
 > NOTE: Because this is a space-scoped broker, OSBA will only show up in the marketplace in the space or spaces which it is registered.
 
-* Run `cf marketplace` using the CLI. Within the marketplace, you should see a large number of service offerings prefixed by `azure-` which are advertised by the broker
+  ```console
+  cf marketplace
+  ```
 
 #### Stratos Console 
 
-If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/stratos) for Cloud Foundry
+If you're running the [Stratos Web UI](https://github.com/cloudfoundry-incubator/stratos) for Cloud Foundry
 
 ![Stratos Marketplace](../.media/marketplace.png)
+
+_Within the marketplace, you should see a large number of service offerings prefixed by `azure-` which are advertised by the broker._
 
 ## Automation
 
@@ -227,27 +255,25 @@ If you're running the [Stratos UI](https://github.com/cloudfoundry-incubator/str
 * An working knowledge of [terraform](https://portal.azure.com) and use of [terraform providers](https://www.terraform.io/docs/providers/)
 ## Automating Deployment
 
-### Usage
-Create an Azure Storage Account and Container to store our `terraform.tfstate`, required by our `init-terraform-state` pipeline job
-
 ### Create Azure Storage
-> _Similar to how [OSBA]() required we create a backup [Redis Cache Store](#create-redis-cache-store), here we create an [Azure Storage Container]() to hold our `terraform.tfstate`._  
+
+> _Alternatively, if you have an existing [Storage Account]() and [Container]() you would prefer to use we can [Skip](#ci-pipelines) this step._
 >
-> _We illustrate how to automate this step and generate our `manifest.yml` using create-storage-cache.sh interactive script provided under `/scripts`_
+> _Remember to note the `storage_account_name` and `container` in the output as this will be needed later to populate or pipeline `params.yml`_
 
 ```sh
-$ az group create --name "<name>" \
-  --location "<region>"
+$ az group create --name CHANGME \
+  --location CHANGME
 ```
 ```sh
-$ az storage account create --name "<name>" \
-  --resource-group "<resource group>" \
-  --location "<region>" \
-  --sku "Standard_LRS"
+$ az storage account create --name CHANGME \
+  --resource-group CHANGME \
+  --location CHANGME \
+  --sku CHANGME
 ```
 
 ```sh
-$ az storage container create --name terraformstate --account-name <name>
+$ az storage container create --name terraformstate --account-name CHANGME
 ```
 ### Get Keys
 
@@ -258,6 +284,13 @@ $ AZURE_REDIS_PRIMARY_KEY=$(az redis list-keys -n <name> -g <resource group> | j
 ```
 
 ### CI Pipelines
+
+Before we continue, let's make sure we have all the requisite information required for configuring our pipeline(s).  using the environment variable we `set` earlier
+
+* [AZURE_SUBSCRIPTION_ID](#configure-your-azure-account)
+* [AZURE_TENANT_ID](#create-a-service-principal)
+AZURE_CLIENT_ID=<AppId>
+AZURE_CLIENT_SECRET=<Password>
 
 > _The pipeline(s) we'll be using are maintained in this same repostory. If you haven't already, let's clone this repository [cf-byo-broker](https://github.com/18F/cf-byo-broker) containing all the artifacts required._
 
@@ -309,12 +342,24 @@ Change directory to `cf-byo-broker\azure-service-broker\terraformation`
 │   ├── ...
 │   └── terraformation
 │       ├── main.tf
-│       ├── outputs.tf
-│       └── variables.tf
 └── ...
 ```
 
-#### AzureRM Backend
+### AzureRM Backend
+_The Terraform state backend is configured when running Terraform init. In order to configure the state backend, the following data is required._
+>
+* _**storage_account_name**_ - The name of the Azure Storage account.
+* _**container_name**_ - The name of the blob container.
+* _**key**_ - The name of the state store file to be created.
+* _**access_key**_ - The storage access key.
+      
+    > #### _**Recommended**_ 
+    >_This can also be sourced from the ARM_ACCESS_KEY environment variable._
+    >
+    > Let's set our [`ARM_ACCESS_KEY`](https://www.terraform.io/docs/backends/types/azurerm.html) storage account key now. 
+    >
+    >     $ export ARM_ACCESS_KEY=$(az storage account keys list --account-name CHANGEME --resource-group CHANGEME | jq -r .[0].value)
+    
 
 ```yml
 terraform {
@@ -328,30 +373,18 @@ terraform {
 
 ```
 
-> **Note**: _[When authenticating using the Storage Account's Access Key](https://www.terraform.io/docs/backends/types/azurerm.html) - the following fields and in our case, environement variables are also supported._
-
-* _**access_key**_ - (Optional) The Access Key used to    access the Blob Storage Account. This can also be sourced from the ARM_ACCESS_KEY environment variable.
-
-Let's set our _**access_key**_ now. 
-
-    
-    $ export ARM_ACCESS_KEY=$(az storage account keys list --account-name 18fci --resource-group 18F | jq -r .[0].value)
-    
-
 ```bash
 $ terraform init
 $ terraform plan -out=plan
 $ terraform apply "plan"
 ```
 
-#### Tearing down environment
+### Tearing down environment
 
->**Note:** This will only destroy resources deployed by Terraform. 
+>**Note:** _This will ofcourse only destroy resources deployed by Terraform._ 
 
 ```bash
 terraform destroy
 ```
 
 ## Troubleshooting
-
-
