@@ -46,18 +46,18 @@ In order to complete the tutorial, please be sure you have:
 1. Run `az login` and follow the instructions in the command output to authorize `az` to use your account
 2. List your Azure subscriptions:
     ```console
-    az account list -o table
+    $ az account list -o table
     ```
 3. Copy your subscription ID and _**save it in an environment variable**_:
 
-    ### bash
+    ##### bash
     ```console
-    export AZURE_SUBSCRIPTION_ID="<SubscriptionId>"
+    $ export AZURE_SUBSCRIPTION_ID="<SubscriptionId>"
     ```
 
-    ### powershell
+    ##### powershell
     ```console
-    $env:AZURE_SUBSCRIPTION_ID = "<SubscriptionId>"
+    $ env:AZURE_SUBSCRIPTION_ID = "<SubscriptionId>"
     ```
 
 ### Create a Resource Group
@@ -65,7 +65,7 @@ In order to complete the tutorial, please be sure you have:
 Create one with the az cli using the following command.
 
 ```console
-az group create --name CHANGEME --location CHANGME
+$ az group create --name CHANGEME --location CHANGME
 ```
 ### Create Redis Cache Store
 
@@ -123,18 +123,18 @@ $ az redis create -n <name> \
 
 2. Save the values from the command output in environment variables:
 
-    ### bash
+    ##### bash
     ```console
-    export AZURE_TENANT_ID=<Tenant>
-    export AZURE_CLIENT_ID=<AppId>
-    export AZURE_CLIENT_SECRET=<Password>
+    $ export AZURE_TENANT_ID={$tenant}
+    $ export AZURE_CLIENT_ID=${addId}
+    $ export AZURE_CLIENT_SECRET=${password}
     ```
 
-    ### powershell
+    ##### powershell
     ```console
-    $env:AZURE_TENANT_ID = "<Tenant>"
-    $env:AZURE_CLIENT_ID = "<AppId>"
-    $env:AZURE_CLIENT_SECRET = "<Password>"
+    $ env:AZURE_TENANT_ID = "${tenant}"
+    $ env:AZURE_CLIENT_ID = "${appId}
+    $ env:AZURE_CLIENT_SECRET = "${password}"
     ```
 
 ## Deploying the Broker
@@ -174,7 +174,7 @@ Let's edit our manifest at `contrib/cf/manifest.yml` and enter the values obtain
 
 > _In later steps, we show how to automate this step and generate our `manifest.yml` using create-storage-provider.sh interactive script under `/scripts`_
 
-```yaml
+```yml
 ---
   applications:
     - name: osba
@@ -235,7 +235,7 @@ At this point, your new service broker called `open-service-broker-azure` should
 > NOTE: Because this is a space-scoped broker, OSBA will only show up in the marketplace in the space or spaces which it is registered.
 
   ```console
-  cf marketplace
+  $ cf marketplace
   ```
 
 #### Stratos Console 
@@ -294,9 +294,8 @@ $ az storage container create --name terraformstate --account-name CHANGME
   $ git clone https://github.com/18F/cf-byo-broker.git
   ```
 
-  Change directory to `cf-byo-broker\azure-service-broker`
-
-```
+```sh
+$ cd cf-byo-broker\azure-service-broker
 .
 ├── azure-service-broker
 │   ├── README.md
@@ -309,21 +308,6 @@ $ az storage container create --name terraformstate --account-name CHANGME
 │       ├── main.tf
 └── ...
 ```
-## Using Concourse.ci
-
-> Log into concourse and set the pipeline
-
-  ```sh
-  $ fly -t bosh-lite login --concourse-url http://192.168.100.4:8080
-  ```
-
-  ```sh
-  $ fly -t bosh-lite set-pipeline -p install-osba-cf \
-    -c azure-service-broker/ci/pipeline.yml \
-    -l azure-service-broker/ci/params.yml
-  ```
-
-![Concourse.ci Dashboard](../.media/dashboard.png)
 
 ## Using `terraform` CLI
 
@@ -373,12 +357,12 @@ $ terraform plan -out=plan
 $ terraform apply "plan"
 ```
 
-### Tearing down environment
+### Tearing down
 
 >**Note:** _This will ofcourse only destroy resources deployed by Terraform._ 
 
 ```bash
-terraform destroy
+$ terraform destroy
 ```
 
 ## Troubleshooting
