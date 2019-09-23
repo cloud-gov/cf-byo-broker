@@ -83,7 +83,7 @@ jobs:
 - name: deploy-broker
   serial_groups: [space1]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
       trigger: true
     - get: broker-source
@@ -111,7 +111,7 @@ jobs:
 - name: create-service-broker
   serial_groups: [space1]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
       trigger: true
       passed: [deploy-broker]
@@ -135,7 +135,7 @@ jobs:
 - name: marketplace-via-cli
   serial_groups: [space1]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
       trigger: true
       passed: [create-service-broker]
@@ -152,7 +152,7 @@ jobs:
 - name: another-space
   serial_groups: [space2]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
       trigger: true
       passed: [marketplace-via-cli]
@@ -181,7 +181,7 @@ jobs:
 - name: create-bind-purge
   serial_groups: [space1]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
       trigger: true
       passed: [marketplace-via-cli]
@@ -221,7 +221,7 @@ jobs:
 - name: package-broker
   serial_groups: [space1,space2]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
     - get: broker-source
       passed: [create-bind-purge]
@@ -236,7 +236,7 @@ jobs:
 - name: verify-candidate-zip
   serial_groups: [space1,space2]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
     - get: broker-source
       passed: [package-broker]
@@ -251,7 +251,7 @@ jobs:
 - name: deploy-stratos
   serial_groups: [stratos]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
     - get: stratos
   - task: deploy-stratos
@@ -264,7 +264,7 @@ jobs:
 - name: delete-stratos
   serial_groups: [stratos]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
       passed: [deploy-stratos]
   - task: delete-stratos

@@ -81,7 +81,7 @@ jobs:
 - name: deploy-gcp-service-broker
   serial_groups: [keep-it-simple]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
     - get: gcp-service-broker
   - task: deploy-gcp-service-broker
@@ -120,7 +120,7 @@ jobs:
 - name: create-trades-service-instance
   serial_groups: [keep-it-simple]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
       passed: [create-service-broker]
       trigger: true
@@ -141,7 +141,7 @@ jobs:
 - name: exercise-trades-service-instance
   serial_groups: [keep-it-simple]
   plan:
-  - aggregate:
+  - in_parallel:
     - get: cg-customer-broker
       passed: [create-trades-service-instance]
       trigger: true
