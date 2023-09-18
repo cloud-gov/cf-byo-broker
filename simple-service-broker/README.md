@@ -452,4 +452,4 @@ When you are done with it, you can clean up by deleting the service broker and t
 
 * You can build your own service brokers by implementing the API. Libraries exist in many languages like Spring and GO that allow you to quickly build new brokers. More information is available: [Open Service Broker API](https://www.openservicebrokerapi.org/).
 
-* The good folks at Stark and Wayne maintain a tool called [eden](https://github.com/starkandwayne/eden). Eden is a command line client for Open Service Broker API compliant brokers. It is very useful in developing and troubleshooting brokers.
+* The good folks at Stark and Wayne maintain a tool called [eden](https://github.com/Qarik-Group/eden). Eden is a command line client for Open Service Broker API compliant brokers. It is very useful in developing and troubleshooting brokers.
